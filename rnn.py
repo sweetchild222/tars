@@ -204,8 +204,8 @@ def parse_arg():
     parser.add_argument('-g', dest='gradientType', type=str, default='rmsProp', choices=['adam', 'sgd', 'rmsProp'], help='sample gradient type (default: rmsProp)')
     parser.add_argument('-a', dest='activationType', type=str, default='tanh', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='he_normal', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: he_normal)')
-    parser.add_argument('-e', dest='epochs', type=int, default=100, help='epochs (default: 100)')
-    parser.add_argument('-b', dest='batches', type=int, default=20, help='batches (default: 20)')
+    parser.add_argument('-e', dest='epochs', type=int, default=200, help='epochs (default: 200)')
+    parser.add_argument('-b', dest='batches', type=int, default=30, help='batches (default: 30)')
     parser.add_argument('--f', dest='stateful', action='store_true', help='stateful (default: False)')
     parser.add_argument('--u', dest='unroll', action='store_true', help='unroll (default: False)')
 
