@@ -117,7 +117,7 @@ def test(tars, test_x_states, test_t_states, mapToChar, oneHotmap, stateful):
 
             correct_string = 'O' if correct else 'X'
 
-            print_data = {'batch / stateful': str(p) + ' / ' + str(i)} if stateful is True else {}
+            print_data = {'batch - stateful': str(p) + ' - ' + str(i)} if stateful is True else {}
 
             print_data.update({'correct':correct_string, 'input':person_name, 'predict':predict, 'target':target})
 
