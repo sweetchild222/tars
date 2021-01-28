@@ -6,7 +6,7 @@ All code found in this repository is licensed under GPL v3
 ----
 Copyright 2016-2021 James Choi(sweetchild22.ik@gmail.com)
 
-The files are tars for deep learning engine, big data and so on
+The files are tars for deep learning engine
 
 The files are free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
