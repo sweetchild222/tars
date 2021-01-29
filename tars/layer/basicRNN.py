@@ -205,4 +205,6 @@ class BasicRNN(ABSLayer):
 
     def outputShape(self):
 
-        return (self.getUnits(), )
+        (sequence_length, vocab_size) = self.input_shape
+
+        return (sequence_length, self.getUnits())
