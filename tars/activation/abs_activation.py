@@ -14,7 +14,7 @@ class ABSActivation(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def predict(self, output):
+    def test(self, output):
         pass
 
 

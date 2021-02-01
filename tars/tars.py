@@ -149,12 +149,12 @@ class Tars:
         return batch_e
 
 
-    def predictCore(self, head, batch_x):
+    def testCore(self, head, batch_x):
 
         next_layer = head
 
         while True:
-            batch_y = next_layer.predict(batch_x)
+            batch_y = next_layer.test(batch_x)
 
             next_layer = next_layer.forwardLayer()
 
@@ -166,6 +166,6 @@ class Tars:
         return batch_y
 
 
-    def predict(self, batch_x):
+    def test(self, batch_x):
 
-        return self.predictCore(self.head, batch_x)
+        return self.testCore(self.head, batch_x)

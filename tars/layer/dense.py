@@ -31,11 +31,11 @@ class Dense(ABSLayer):
         return layerName
 
 
-    def predict(self, input):
+    def test(self, input):
 
         output = self.forwardCore(input)
 
-        return self.activation.predict(output)
+        return self.activation.test(output)
 
 
     def forward(self, input):

@@ -103,7 +103,7 @@ def train_test(tars, train_x, train_t, test_x, epochs, batches, draw_epoch_term)
         print_table({'Epochs':[str(epoch + 1) +'/' + str(epochs)], 'Loss':[loss / i]})
 
         if ((epochs - epoch) % draw_epoch_term) == 1:
-            test_y_on_epoch.append({'epoch': epoch + 1, 'test_y': tars.predict(test_x)})
+            test_y_on_epoch.append({'epoch': epoch + 1, 'test_y': tars.test(test_x)})
 
     train_span = (dt.datetime.now() - start_time)
 

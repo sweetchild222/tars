@@ -14,7 +14,7 @@ class Sigmoid(ABSActivation):
         return self.__class__.__name__
 
 
-    def predict(self, intput):
+    def test(self, intput):
 
         return self.forwardCore(intput)
 

@@ -62,9 +62,9 @@ def testCore(tars, test_x_list, test_t_list):
 
         test_x = test_x.reshape((1, ) + test_x.shape)
 
-        test_y = tars.predict(test_x)
+        test_y = tars.test(test_x)
 
-        #last output will be next predict input
+        #last output will be next test input
         y = test_y[:, -1, :].reshape((test_y.shape[0], 1, -1))
 
         test_y_phase = []
@@ -73,7 +73,7 @@ def testCore(tars, test_x_list, test_t_list):
         x = y
 
         for i in range(sequence_length - input_sequence):
-            y = tars.predict(x)
+            y = tars.test(x)
             test_y_phase.append(y.reshape(-1))
 
             mapIndex = np.argmax(y.reshape(-1))
@@ -108,10 +108,10 @@ def test(tars, test_x_states, test_t_states, mapToChar, oneHotmap, stateful):
         i = 0
         for y in test_y:
             person_name = covertString(persons[i], mapToChar)
-            predict = covertString(y, mapToChar)
+            test = covertString(y, mapToChar)
             target = covertString(test_t[i][len(person_name) - 1: ], mapToChar)
 
-            correct = (predict == target)
+            correct = (test == target)
 
             correct_count += int(correct == True)
 
@@ -119,7 +119,7 @@ def test(tars, test_x_states, test_t_states, mapToChar, oneHotmap, stateful):
 
             print_data = {'batch - stateful': str(p) + ' - ' + str(i)} if stateful is True else {}
 
-            print_data.update({'correct':correct_string, 'input':person_name, 'predict':predict, 'target':target})
+            print_data.update({'correct':correct_string, 'input':person_name, 'test':test, 'target':target})
 
             print_list('test', print_data)
 

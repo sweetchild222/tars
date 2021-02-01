@@ -68,13 +68,13 @@ class Convolution(ABSLayer):
         return np.array(batch_padded_list)
 
 
-    def predict(self, input):
+    def test(self, input):
 
         input = self.appendPadding(input)
 
         output = self.forwardCore(input)
 
-        return self.activation.predict(output)
+        return self.activation.test(output)
 
 
     def forward(self, input):

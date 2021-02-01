@@ -17,7 +17,7 @@ class Input(ABSLayer):
         return self.__class__.__name__
 
 
-    def predict(self, input):
+    def test(self, input):
 
         return self.forwardCore(input)
 

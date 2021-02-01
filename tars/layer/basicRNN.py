@@ -21,8 +21,8 @@ class BasicRNN(ABSLayer):
 
         self.gradient = self.gradientBind(gradient, self.weight_i_list, self.weight_h_list, self.bias_list)
 
-        self.h_predict = None
-        self.h_predict_index = 0
+        self.h_test = None
+        self.h_test_index = 0
 
         self.h_next = None
 
@@ -61,20 +61,20 @@ class BasicRNN(ABSLayer):
     def resetState(self):
 
         self.h_next = None
-        self.h_predict = None
-        self.h_predict_index = 0
+        self.h_test = None
+        self.h_test_index = 0
 
 
-    def predict(self, input):
+    def test(self, input):
 
         (sequence_length, vocab_size) = self.input_shape
 
         (batche, cur_sequence_length, cur_vocab_size) = input.shape
 
-        h_predict_list = []
+        h_test_list = []
 
-        if (self.stateful is False and self.h_predict_index == 0) or self.h_predict is None:
-            self.h_predict = np.zeros((batche, self.getUnits()))
+        if (self.stateful is False and self.h_test_index == 0) or self.h_test is None:
+            self.h_test = np.zeros((batche, self.getUnits()))
 
         activation = createActivation(self.activation)
 
@@ -82,20 +82,20 @@ class BasicRNN(ABSLayer):
 
             i = input[:,s,:]
 
-            kernel_index = 0 if self.unroll is False else self.h_predict_index
+            kernel_index = 0 if self.unroll is False else self.h_test_index
 
             matmul_i = np.matmul(i, self.weight_i_list[kernel_index])
-            matmul_h = np.matmul(self.h_predict, self.weight_h_list[kernel_index])
+            matmul_h = np.matmul(self.h_test, self.weight_h_list[kernel_index])
 
-            self.h_predict = activation.forward(matmul_i + matmul_h + self.bias_list[kernel_index])
-            h_predict_list.append(self.h_predict)
+            self.h_test = activation.forward(matmul_i + matmul_h + self.bias_list[kernel_index])
+            h_test_list.append(self.h_test)
 
-            self.h_predict_index = (self.h_predict_index + 1) % sequence_length
+            self.h_test_index = (self.h_test_index + 1) % sequence_length
 
-            if self.stateful is False and self.h_predict_index == 0:
-                self.h_predict = np.zeros((batche, self.getUnits()))
+            if self.stateful is False and self.h_test_index == 0:
+                self.h_test = np.zeros((batche, self.getUnits()))
 
-        return np.swapaxes(np.array(h_predict_list), 1, 0)
+        return np.swapaxes(np.array(h_test_list), 1, 0)
 
 
     def forward(self, input):

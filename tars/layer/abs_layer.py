@@ -34,7 +34,7 @@ class ABSLayer(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def predict(self, input):
+    def test(self, input):
         pass
 
 

@@ -91,7 +91,7 @@ def train(tars, train_x, train_t, epochs, batches):
 
 def test(tars, test_x, test_t):
 
-    test_y = tars.predict(test_x)
+    test_y = tars.test(test_x)
 
     count = test_y.shape[0]
     correct_count = 0
@@ -108,7 +108,7 @@ def test(tars, test_x, test_t):
         correct_count += (1 if correct else 0)
         correct_char = 'O' if correct else 'X'
 
-        print_table({'Predict':[y.round(decimals=2)], 'Label':[t.round(decimals=2)], 'Correct':[correct_char]})
+        print_table({'Test':[y.round(decimals=2)], 'Label':[t.round(decimals=2)], 'Correct':[correct_char]})
 
     accuracy = float(correct_count / count) * 100
 
