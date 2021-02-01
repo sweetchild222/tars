@@ -132,9 +132,9 @@ def parse_arg():
     parser.add_argument('-g', dest='gradientType', type=str, default='rmsProp', choices=['adam', 'sgd', 'rmsProp'], help='sample gradient type (default: rmsProp)')
     parser.add_argument('-a', dest='activationType', type=str, default='elu', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='glorot_uniform', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: glorot_uniform)')
-    parser.add_argument('-e', dest='epochs', type=int, default=60, help='epochs (default: 60)')
+    parser.add_argument('-e', dest='epochs', type=int, default=30, help='epochs (default: 30)')
     parser.add_argument('-b', dest='batches', type=int, default=100, help='batches (default: 100)')
-    parser.add_argument('-d', dest='draw_epoch_term', type=int, default=20, help='draw epoch term (default: 20)')
+    parser.add_argument('-d', dest='draw_epoch_term', type=int, default=10, help='draw epoch term (default: 10)')
 
     args = parser.parse_args()
 

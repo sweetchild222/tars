@@ -138,7 +138,7 @@ def parse_arg():
     parser.add_argument('-c', dest='classes', type=int, default='3', metavar="[1-10]", help='classes (default: 3)')
     parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='adam', choices=['adam', 'sgd', 'rmsProp'], help='sample gradient type (default: rmsProp)')
-    parser.add_argument('-a', dest='activationType', type=str, default='elu', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
+    parser.add_argument('-a', dest='activationType', type=str, default='leakyRelu', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='he_normal', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: he_normal)')
     parser.add_argument('-e', dest='epochs', type=int, default=5, help='epochs (default: 5)')
     parser.add_argument('-b', dest='batches', type=int, help='batches (default: classes x 3)')
