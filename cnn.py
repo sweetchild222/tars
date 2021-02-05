@@ -14,7 +14,7 @@ def print_oneHotMap(oneHotMap):
     classes = len(oneHotMap)
 
     for mapKey in oneHotMap:
-        map = np.eye(classes)[oneHotMap[mapKey]].reshape(classes, 1)
+        map = np.eye(classes)[oneHotMap[mapKey]][:, np.newaxis]
         oneHotList.append(map.reshape(-1))
         labelList.append(mapKey)
 

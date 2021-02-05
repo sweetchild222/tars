@@ -60,12 +60,12 @@ def testCore(tars, test_x_list, test_t_list):
         input_sequence = test_x.shape[-2]
         sequence_length = test_t.shape[-2]
 
-        test_x = test_x.reshape((1, ) + test_x.shape)
+        test_x = test_x[np.newaxis, :, :]
 
         test_y = tars.test(test_x)
 
         #last output will be next test input
-        y = test_y[:, -1, :].reshape((test_y.shape[0], 1, -1))
+        y = test_y[:, -1, :][:, np.newaxis, :]
 
         test_y_phase = []
         test_y_phase.append(y.reshape(-1))

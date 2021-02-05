@@ -159,7 +159,7 @@ class BasicRNN(ABSLayer):
             h_prev = self.h_list[s]
 
             i = self.last_input[:, s,:]
-            i = i.reshape(i.shape + (1, ))
+            i = i[:, :, np.newaxis]
 
             err = error[:, s,:]
 
@@ -168,11 +168,8 @@ class BasicRNN(ABSLayer):
             d_h_raw = activation.backward(back_h_error, target)
             d_h_prev = np.matmul(d_h_raw, self.weight_h_list[kernel_index].T)
 
-            d_h_raw_reshape = d_h_raw.reshape(d_h_raw.shape[:-1] + (1, d_h_raw.shape[-1]))
-            h_prev_reshape = h_prev.reshape((h_prev.shape) + (1,))
-
-            wi_delta_list.append(np.matmul(i, d_h_raw_reshape))
-            wh_delta_list.append(np.matmul(h_prev_reshape, d_h_raw_reshape))
+            wi_delta_list.append(np.matmul(i, d_h_raw[:, np.newaxis,:]))
+            wh_delta_list.append(np.matmul(h_prev[:, :, np.newaxis], d_h_raw[:, np.newaxis,:]))
             b_delta_list.append(d_h_raw)
 
         self.gradientUpdate(np.array(wi_delta_list), np.array(wh_delta_list), np.array(b_delta_list))
