@@ -60,7 +60,7 @@ def testCore(tars, test_x_list, test_t_list):
         input_sequence = test_x.shape[-2]
         sequence_length = test_t.shape[-2]
 
-        test_x = test_x[np.newaxis, :, :]
+        test_x = np.expand_dims(test_x, axis=0)
 
         test_y = tars.test(test_x)
 
