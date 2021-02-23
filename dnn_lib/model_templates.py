@@ -56,7 +56,6 @@ def template_complex(activation, weightInit, input_shape, classes):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'flatten'},
         {'type':'dense', 'parameter':{'units':1024, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':512, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit}},
@@ -69,7 +68,6 @@ def template_light(activation, weightInit, input_shape, classes):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'flatten'},
         {'type':'dense', 'parameter':{'units':512, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':classes, 'activation':activation_softmax(), 'weight_init':weightInit}}]
