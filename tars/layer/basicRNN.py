@@ -168,8 +168,11 @@ class BasicRNN(ABSLayer):
             d_h_raw = activation.backward(back_h_error, target)
             d_h_prev = np.matmul(d_h_raw, self.weight_h_list[kernel_index].T)
 
-            wi_delta_list.append(np.matmul(i, np.expand_dims(d_h_raw, axis=1)))
-            wh_delta_list.append(np.matmul(np.expand_dims(h_prev, axis=-1), np.expand_dims(d_h_raw, axis=1)))
+            wi_delta = np.matmul(i, np.expand_dims(d_h_raw, axis=1))
+            wh_delta = np.matmul(np.expand_dims(h_prev, axis=-1), np.expand_dims(d_h_raw, axis=1))
+
+            wi_delta_list.append(wi_delta)
+            wh_delta_list.append(wh_delta)
             b_delta_list.append(d_h_raw)
 
         self.gradientUpdate(np.array(wi_delta_list), np.array(wh_delta_list), np.array(b_delta_list))
