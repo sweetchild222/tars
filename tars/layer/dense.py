@@ -57,7 +57,7 @@ class Dense(ABSLayer):
         error = self.activation.backward(error, target)
 
         i = np.expand_dims(self.last_input, axis=-1)
-        err = error.reshape(error.shape[:-1] + (1, error.shape[-1]))
+        err = np.expand_dims(error, axis=-2)
 
         w_delta = np.matmul(i, err)
         b_delta = error
