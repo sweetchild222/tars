@@ -35,7 +35,7 @@ def print_arg(model, activation, weightInit, gradient, classes, epochs, batches,
 
     trimed = batches > train_x_shape[0]
 
-    batches = train_data_count if trimed else batches
+    batches = train_x_shape[0] if trimed else batches
 
     batch_str = str(batches) + (' (trimed)' if trimed else '')
 

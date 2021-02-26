@@ -13,6 +13,9 @@ def randomLabels(classes, trainPath):
 	for dirname in os.listdir(trainPath):
 		labels.append(dirname)
 
+	if classes > len(labels):
+		classes = len(labels)
+
 	return random.sample(labels, k=classes)
 
 
