@@ -39,7 +39,7 @@ def loadMNISTFiles(path, lables):
 
 			filePath = subPath + '/' + fileName
 
-			img = np.array(Image.open(filePath)).astype(np.float32)
+			img = np.array(Image.open(filePath).convert('L')).astype(np.uint8)
 
 			imgSize = img.shape[0]
 
@@ -48,7 +48,6 @@ def loadMNISTFiles(path, lables):
 			X.append(colorImg)
 
 			T.append(label)
-
 
 	#matrixToImage(np.array(X).reshape(len(X), 1, imgSize * imgSize))
 
@@ -94,7 +93,7 @@ def loadDataSet(classes):
 
     train_x, train_t, test_x, test_t = extractMNIST(classes, 'cnn_lib/mnist/train', 'cnn_lib/mnist/test')
 
-    all_x = np.vstack((train_x, test_x))
+    all_x = np.vstack((train_x, test_x)).astype(np.float32)
     all_x -= np.mean(all_x)
     all_x /= np.std(all_x)
 
