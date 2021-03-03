@@ -50,23 +50,7 @@ class Convolution(ABSLayer):
 
         size = self.padding_size
 
-        (batches, input_height, input_width, input_colors) = input.shape
-
-        batch_padded_list = []
-        for i in input:
-            pad_size = ((size[0], size[0]),(size[1], size[1]))
-
-            padded_list = []
-
-            for c in range(input_colors):
-                padded = np.pad(i[:,:, c], pad_size, 'constant', constant_values=0)
-                padded = np.expand_dims(padded, axis=-1)
-                padded_list.append(padded)
-
-            batch_padded_list.append(np.concatenate(padded_list, axis = 2))
-
-        return np.array(batch_padded_list)
-
+        return np.pad(input, ((0, 0), (size[0], size[0]), (size[1], size[1]), (0, 0)), 'constant', constant_values=0)
 
     def test(self, input):
 
@@ -150,7 +134,7 @@ class Convolution(ABSLayer):
 
                 #shallow copy
                 bl_err = back_layer_error[:, input_y:input_y + kernel_height, input_x:input_x + kernel_width, :]
-                bl_err += np.sum(bw_err, axis=bw_err.ndim - 1)
+                bl_err += np.sum(bw_err, axis=-1)
 
                 input_x += stride_x
                 out_x += 1
