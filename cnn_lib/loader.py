@@ -67,41 +67,40 @@ def extractMNIST(classes, trainPath, testPath):
 
 def makeOneHotMap(train_t, test_t):
 
-    labels = np.hstack((train_t, test_t))
+	labels = np.hstack((train_t, test_t))
 
-    unique = np.unique(labels, return_counts=False)
+	unique = np.unique(labels, return_counts=False)
 
-    return {key : index for index, key in enumerate(unique)}
+	return {key : index for index, key in enumerate(unique)}
 
 
 def encodeOneHot(oneHotMap, train_t, test_t):
 
-    labels = np.hstack((train_t, test_t))
+	labels = np.hstack((train_t, test_t))
 
-    classes = len(oneHotMap)
+	classes = len(oneHotMap)
 
-    labels = [np.eye(classes)[oneHotMap[l]] for l in labels]
-    labels = np.array(labels)
+	labels = [np.eye(classes)[oneHotMap[l]] for l in labels]
+	labels = np.array(labels)
 
-    train = labels[0:len(train_t)]
-    test = labels[-len(test_t):]
+	train = labels[0:len(train_t)]
+	test = labels[-len(test_t):]
 
-    return train, test
-
+	return train, test
 
 def loadDataSet(classes):
 
-    train_x, train_t, test_x, test_t = extractMNIST(classes, 'cnn_lib/mnist/train', 'cnn_lib/mnist/test')
+	train_x, train_t, test_x, test_t = extractMNIST(classes, 'cnn_lib/mnist/train', 'cnn_lib/mnist/test')	
 
-    all_x = np.vstack((train_x, test_x)).astype(np.float32)
-    all_x -= np.mean(all_x)
-    all_x /= np.std(all_x)
+	all_x = np.vstack((train_x, test_x)).astype(np.float32)
+	all_x -= np.mean(all_x)
+	all_x /= np.std(all_x)
 
-    train_x = all_x[0:len(train_x)]
-    test_x = all_x[-len(test_x):]
+	train_x = all_x[0:len(train_x)]
+	test_x = all_x[-len(test_x):]
 
-    oneHotMap = makeOneHotMap(train_t, test_t)
+	oneHotMap = makeOneHotMap(train_t, test_t)
 
-    train_t, test_t = encodeOneHot(oneHotMap, train_t, test_t)
+	train_t, test_t = encodeOneHot(oneHotMap, train_t, test_t)
 
-    return train_x, train_t, test_x, test_t, oneHotMap
+	return train_x, train_t, test_x, test_t, oneHotMap
