@@ -52,6 +52,7 @@ class Convolution(ABSLayer):
 
         return np.pad(input, ((0, 0), (size[0], size[0]), (size[1], size[1]), (0, 0)), 'constant', constant_values=0)
 
+
     def test(self, input):
 
         input = self.appendPadding(input)
@@ -88,7 +89,7 @@ class Convolution(ABSLayer):
             while (input_x + kernel_width) <= input_width:
 
                 i = input[:, input_y:input_y + kernel_height, input_x:input_x + kernel_width, :]
-                i = np.concatenate([i] * filters, axis=3).reshape(i.shape + (filters, ))
+                i = np.concatenate([i] * filters, axis=-1).reshape(i.shape + (filters, ))
 
                 iw = i * self.weight
                 iw = np.sum(iw.reshape((batches, -1, filters)), axis=1)
