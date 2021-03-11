@@ -80,10 +80,20 @@ class MaxPooling(ABSLayer):
             input_x = out_x = 0
             while (input_x + pool_width) <= input_width:
 
-                for b in range(batches):
-                    for c in range(input_colors):
-                        (unravel_y, unravel_x) = self.unravel_indices(self.last_input[b, input_y:input_y + pool_height, input_x:input_x + pool_width, c])
-                        back_layer_error[b, input_y + unravel_y, input_x + unravel_x, c] = error[b, out_y, out_x, c]
+                input = self.last_input[:, input_y:input_y + pool_height, input_x:input_x + pool_width, :]
+                input = input.reshape((batches, -1, input_colors))
+
+                max_indices = np.nanargmax(input, axis=1)
+
+                unravel_indices = np.unravel_index(max_indices.reshape(-1), self.pool_size)
+                unravel_indices = np.swapaxes(np.array(unravel_indices), 0, 1)
+
+                unravel_indices = unravel_indices.reshape((batches, input_colors, -1))
+
+                for batche_index in range(len(unravel_indices)):
+                    for color_index in range(len(unravel_indices[batche_index])):
+                        indices = unravel_indices[batche_index][color_index]
+                        back_layer_error[batche_index, input_y + unravel_indices[:][:][0], input_x + unravel_indices[:][:][1], color_index] = error[batche_index, out_y, out_x, color_index]
 
                 input_x += stride_x
                 out_x += 1
