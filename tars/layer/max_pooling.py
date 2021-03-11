@@ -65,8 +65,10 @@ class MaxPooling(ABSLayer):
         (pool_height, pool_width) = self.pool_size
         (stride_y, stride_x) = self.strides
 
+        indices_batch = np.array([[i] * input_colors for i in range(batches)]).reshape(-1)
+        indices_color = np.array([[i] for i in range(input_colors)] * batches).reshape(-1)
+
         back_layer_error = np.zeros(((batches, ) + self.input_shape))
-        back_layer_error2 = np.zeros(((batches, ) + self.input_shape))
 
         input_y = out_y = 0
         while (input_y + pool_height) <= input_height:
@@ -79,11 +81,10 @@ class MaxPooling(ABSLayer):
                 max_indices = np.nanargmax(input, axis=1)
                 unravel_index = np.unravel_index(max_indices, self.pool_size)
 
-                for b in range(batches):
-                    for c in range(input_colors):
-                        unravel_indices_y = unravel_index[0][b][c]
-                        unravel_indices_x = unravel_index[1][b][c]
-                        back_layer_error[b, input_y + unravel_indices_y, input_x + unravel_indices_x, c] = error[b, out_y, out_x, c]
+                indices_y = np.array(unravel_index[0] + input_y).reshape(-1)
+                indices_x = np.array(unravel_index[1] + input_x).reshape(-1)
+
+                back_layer_error[indices_batch, indices_y, indices_x, indices_color] = (error[:, out_y, out_x,:].reshape(-1))
 
                 input_x += stride_x
                 out_x += 1
