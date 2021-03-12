@@ -55,10 +55,10 @@ def template_complex(activation, weightInit, input_shape, classes):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'convolution', 'parameter':{'filters':8, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
+        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
         {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        {'type':'convolution', 'parameter':{'filters':8, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
+        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
+        {'type':'maxPooling', 'parameter':{'pool_size':(4, 4), 'strides':None}},
         {'type':'flatten'},
         {'type':'dense', 'parameter':{'units':128, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':classes, 'activation':activation_softmax(), 'weight_init':weightInit}}]
@@ -71,7 +71,7 @@ def template_light(activation, weightInit, input_shape, classes):
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
         {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
+        {'type':'maxPooling', 'parameter':{'pool_size':(3, 3), 'strides':(4, 4)}},
         {'type':'flatten'},
         {'type':'dense', 'parameter':{'units':64, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':classes, 'activation':activation_softmax(), 'weight_init':weightInit}}]

@@ -10,6 +10,8 @@ class MaxPooling(ABSLayer):
         self.pool_size = pool_size
         self.strides = pool_size if strides == None else strides
 
+        self.height_indices, self.width_indices, self.color_indices = self.precalcIndex()
+
 
     def resetState(self):
         pass
@@ -29,7 +31,39 @@ class MaxPooling(ABSLayer):
 
         self.last_input = input
 
-        return self.forwardCore(input)
+        #a = self.forwardCore2(input)
+
+        a = self.forwardCore(input)
+
+        #print(np.array_equal(a, b))
+
+        return a
+
+
+    def precalcIndex(self):
+
+        (pool_height, pool_width) = self.pool_size
+        (stride_y, stride_x) = self.strides
+        (output_y, output_x, colors) = self.outputShape()
+
+        height_indices = []
+        width_indices = []
+        color_indices = []
+
+        for y in range(output_y):
+            y_start = y * stride_y
+            for x in range(output_x):
+                x_start = x * stride_x
+                for h in range(pool_height):
+                    h_index = y_start + h
+                    for w in range(pool_width):
+                        w_index = x_start + w
+                        for c_index in range(colors):
+                            height_indices.append(h_index)
+                            width_indices.append(w_index)
+                            color_indices.append(c_index)
+
+        return height_indices, width_indices, color_indices
 
 
     def forwardCore(self, input):
@@ -56,6 +90,25 @@ class MaxPooling(ABSLayer):
             out_y += 1
 
         return output
+
+
+    def forwardCore2(self, input):
+
+        (batches, input_height, input_width, input_colors) = input.shape
+        (pool_height, pool_width) = self.pool_size
+        (stride_y, stride_x) = self.strides
+        (output_y, output_x, colors) = self.outputShape()
+
+        h_indices = np.array(self.height_indices * batches).reshape(-1)
+        w_indices = np.array(self.width_indices * batches).reshape(-1)
+        c_indices = np.array(self.color_indices * batches).reshape(-1)
+        b_indices = np.array([[b] * output_y * output_x * pool_height * pool_width * colors for b in range(batches)]).reshape(-1)
+
+        i = input[b_indices, h_indices, w_indices, c_indices]
+        i = i.reshape((batches, -1, pool_height * pool_width, colors))
+
+        max = np.max(i, axis=-2)
+        return max.reshape((batches,) + self.outputShape())
 
 
     def backward(self, error, y):
