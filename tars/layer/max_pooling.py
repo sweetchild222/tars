@@ -97,7 +97,10 @@ class MaxPooling(ABSLayer):
 
     def outputShape(self):
 
-        calc_shape = ((self.input_shape[0] // self.strides[0]), (self.input_shape[1] // self.strides[1]))
+        numerator_height = (self.input_shape[0] - self.pool_size[0])
+        numerator_width = (self.input_shape[1] - self.pool_size[1])
+
+        calc_shape = ((numerator_height // self.strides[0]) + 1, (numerator_width // self.strides[1]) + 1)
 
         colors = self.input_shape[2]
 
