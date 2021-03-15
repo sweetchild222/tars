@@ -140,8 +140,8 @@ def parse_arg():
     parser.add_argument('-g', dest='gradientType', type=str, default='adam', choices=['adam', 'sgd', 'rmsProp'], help='sample gradient type (default: rmsProp)')
     parser.add_argument('-a', dest='activationType', type=str, default='leakyRelu', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='he_normal', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: he_normal)')
-    parser.add_argument('-e', dest='epochs', type=int, default=5, help='epochs (default: 5)')
-    parser.add_argument('-b', dest='batches', type=int, help='batches (default: classes x 3)')
+    parser.add_argument('-e', dest='epochs', type=int, default=10, help='epochs (default: 10)')
+    parser.add_argument('-b', dest='batches', type=int, help='batches (default: 100)')
     args = parser.parse_args()
 
     if args.classes < 1 or args.classes > 10:
@@ -149,7 +149,7 @@ def parse_arg():
         return None
 
     if args.batches == None:
-        args.batches = args.classes * 3
+        args.batches = 100
 
     if args.batches < 1:
         print('CNN: error: argument -b: invalid value: ', str(args.batches), ' (value must be over 0)')
