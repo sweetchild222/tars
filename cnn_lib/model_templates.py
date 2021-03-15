@@ -79,42 +79,6 @@ def template_light(activation, weightInit, input_shape, classes):
     return layers
 
 
-
-
-'''
-def template_light(activation, weightInit, gradient, input_shape, classes):
-
-    layers = [
-        {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'convolution', 'parameter':{'filters':8, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit, 'gradient':gradient}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        {'type':'convolution', 'parameter':{'filters':8, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit, 'gradient':gradient}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        {'type':'convolution', 'parameter':{'filters':1, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit, 'gradient':gradient}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        #{'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        {'type':'flatten', 'parameter':{}},
-        {'type':'dense', 'parameter':{'units':64, 'activation':activation, 'weight_init':weightInit, 'gradient':gradient}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_softmax(), 'weight_init':weightInit, 'gradient':gradient}}]
-
-    return layers
-
-def template_light(activation, weight, gradient, input_shape, classes):
-
-    layers = [
-        {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'convolution', 'parameter':{'filters':1, 'kernel_size':(5, 5), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit, 'gradient':gradient}},
-        {'type':'convolution', 'parameter':{'filters':1, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit, 'gradient':gradient}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        {'type':'flatten', 'parameter':{}},
-        {'type':'dense', 'parameter':{'units':64, 'activation':activation, 'weight_init':weightInit, 'gradient':gradient}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_softmax(), 'weight_init':weightInit, 'gradient':gradient}}]
-
-    return layers
-
-'''
-
-
 def createLayersTemplate(modelType, activationType, weightInitType, input_shape, classes):
 
     modelTypeList = {'light':template_light, 'complex': template_complex}
