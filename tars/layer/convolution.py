@@ -105,9 +105,9 @@ class Convolution(ABSLayer):
         return output
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
-        error = self.activation.backward(error, target)
+        error = self.activation.backward(error)
 
         batches = error.shape[0]
         (kernel_height, kernel_width, colors, filters) = self.weight.shape

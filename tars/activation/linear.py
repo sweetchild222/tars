@@ -29,6 +29,6 @@ class Linear(ABSActivation):
         return input
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         return error

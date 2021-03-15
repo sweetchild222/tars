@@ -31,6 +31,6 @@ class Relu(ABSActivation):
         return np.where(input > 0, input, 0)
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         return np.where(self.last_input > 0, error, 0)

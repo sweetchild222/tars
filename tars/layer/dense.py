@@ -52,9 +52,9 @@ class Dense(ABSLayer):
         return np.matmul(input, self.weight) + self.bias
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
-        error = self.activation.backward(error, target)
+        error = self.activation.backward(error)
 
         i = np.expand_dims(self.last_input, axis=-1)
         err = np.expand_dims(error, axis=-2)

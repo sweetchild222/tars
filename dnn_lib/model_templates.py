@@ -9,9 +9,6 @@ def gradient_RMSprop():
 
 
 
-def activation_softmax():
-    return {'type':'softmax'}
-
 def activation_linear():
     return {'type':'linear'}
 
@@ -59,7 +56,7 @@ def template_complex(activation, weightInit, input_shape, classes):
         {'type':'dense', 'parameter':{'units':1024, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':512, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_softmax(), 'weight_init':weightInit}}]
+        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
 
     return layers
 
@@ -70,7 +67,7 @@ def template_light(activation, weightInit, input_shape, classes):
         {'type':'input', 'parameter':{'input_shape':input_shape}},
         {'type':'dense', 'parameter':{'units':512, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_softmax(), 'weight_init':weightInit}}]
+        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
 
     return layers
 

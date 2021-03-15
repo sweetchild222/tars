@@ -36,6 +36,6 @@ class ELU(ABSActivation):
         return np.where(input > 0, input, (np.exp(input) - 1) * self.alpha)
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         return error * np.where(self.last_input > 0, 1, (self.last_output + self.alpha))

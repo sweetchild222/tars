@@ -32,6 +32,6 @@ class LeakyRelu(ABSActivation):
         return np.where(input > 0, input, input * self.alpha)
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         return error * np.where(self.last_input > 0, 1, self.alpha)

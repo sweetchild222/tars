@@ -69,7 +69,7 @@ class MaxPooling(ABSLayer):
         return output, max_indices_list
 
 
-    def backward(self, error, y):
+    def backward(self, error):
 
         batches = error.shape[0]
         (input_height, input_width, input_colors) = self.input_shape

@@ -32,6 +32,6 @@ class Tanh(ABSActivation):
         return np.tanh(input)
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         return error * (1 - (self.last_output)**2)

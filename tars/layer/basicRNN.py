@@ -140,7 +140,7 @@ class BasicRNN(ABSLayer):
         return output
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         (batche, sequence_length, units) = error.shape
 
@@ -165,7 +165,7 @@ class BasicRNN(ABSLayer):
 
             back_h_error = err + d_h_prev
 
-            d_h_raw = activation.backward(back_h_error, target)
+            d_h_raw = activation.backward(back_h_error)
             d_h_prev = np.matmul(d_h_raw, self.weight_h_list[kernel_index].T)
 
             wi_delta = np.matmul(i, np.expand_dims(d_h_raw, axis=1))

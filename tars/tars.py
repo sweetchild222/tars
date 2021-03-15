@@ -98,10 +98,23 @@ class Tars:
         return self.trainCore(self.head, self.tail, batch_x, batch_t)
 
 
+    def softmax_forward(self, input):
+
+        output = np.exp(input)
+        sum = np.sum(output, axis=-1, keepdims = True)
+
+        return output / sum
+
+
+    def softmax_backward(self, error, target):
+
+        return (error - target)
+
+
     def crossEntropyLoss(self, batch_y, batch_t):
 
         loss = batch_t * np.log2(batch_y)
-        sum = np.sum(loss, axis=loss.ndim - 1)
+        sum = np.sum(loss, axis= -1)
 
         return -np.mean(sum)
 
@@ -110,11 +123,13 @@ class Tars:
 
         batch_y = self.forward(head, batch_x)
 
-        loss = self.crossEntropyLoss(batch_y, batch_t)
+        batch_y = self.softmax_forward(batch_y)
 
-        batch_e = self.backward(tail, batch_y, batch_t)
+        batch_e = self.softmax_backward(batch_y, batch_t)
 
-        return loss
+        batch_e = self.backward(tail, batch_e)
+
+        return self.crossEntropyLoss(batch_y, batch_t)
 
 
     def forward(self, head, batch_x):
@@ -134,12 +149,12 @@ class Tars:
         return batch_y
 
 
-    def backward(self, tail, batch_e, batch_t):
+    def backward(self, tail, batch_e):
 
         prev_layer = tail
 
         while True:
-            batch_e = prev_layer.backward(batch_e, batch_t)
+            batch_e = prev_layer.backward(batch_e)
 
             prev_layer = prev_layer.backwardLayer()
 
@@ -168,4 +183,6 @@ class Tars:
 
     def test(self, batch_x):
 
-        return self.testCore(self.head, batch_x)
+        batch_y = self.testCore(self.head, batch_x)
+
+        return self.softmax_forward(batch_y)

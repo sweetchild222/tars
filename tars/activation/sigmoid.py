@@ -32,6 +32,6 @@ class Sigmoid(ABSActivation):
         return 1 / (1 + np.exp(-input))
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         return error * self.last_output * (1.0 - self.last_output)

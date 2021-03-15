@@ -44,7 +44,7 @@ class ABSLayer(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def backward(self, error, y):
+    def backward(self, error):
         pass
 
 

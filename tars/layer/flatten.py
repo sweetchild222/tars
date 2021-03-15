@@ -34,7 +34,7 @@ class Flatten(ABSLayer):
         return input.reshape(input.shape[0], -1)
 
 
-    def backward(self, error, target):
+    def backward(self, error):
 
         batches = error.shape[0]
         return error.reshape((batches, ) + self.input_shape)
