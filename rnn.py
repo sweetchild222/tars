@@ -7,12 +7,12 @@ import argparse
 import datetime as dt
 
 
-def print_arg(model, activation, weightInit, gradient, epochs, batches, train_x_states_shape, train_t_states_shape, unroll, stateful):
+def print_arg(model, activation, weightInit, gradient, loss, epochs, batches, train_x_states_shape, train_t_states_shape, unroll, stateful):
 
     classes = train_t_states_shape[-1]
 
-    arg = ['model', 'activation', 'weightInit', 'gradient', 'classes', 'epochs', 'batches', 'train x states shape', 'train t states shape', 'unroll', 'stateful']
-    values = [model, activation, weightInit, gradient, classes, epochs, batches, train_x_states_shape, train_t_states_shape, unroll, stateful]
+    arg = ['model', 'activation', 'weightInit', 'gradient', 'loss', 'classes', 'epochs', 'batches', 'train x states shape', 'train t states shape', 'unroll', 'stateful']
+    values = [model, activation, weightInit, gradient, loss, classes, epochs, batches, train_x_states_shape, train_t_states_shape, unroll, stateful]
     table = {'Argument':arg, 'Values':values}
     print_table(table)
 
@@ -169,26 +169,26 @@ def print_layer(layerList):
     print_table({'Layer':layerNames, 'Output Shape':outputShapes})
 
 
-def create(modelType, activationType, weightInitType, input_shape, classes, gradientType, unroll, stateful):
+def create(modelType, activationType, weightInitType, input_shape, classes, gradientType, lossType, unroll, stateful):
 
     layersTemplate = createLayersTemplate(modelType, activationType, weightInitType, input_shape, classes, unroll, stateful)
-
     gradientTemplate = createGradientTemplate(gradientType)
+    lossTemplate = createLossTemplate(lossType)
 
-    tars = Tars(layersTemplate, gradientTemplate)
+    tars = Tars(layersTemplate, gradientTemplate, lossTemplate)
     layerList = tars.build()
     print_layer(layerList)
 
     return tars
 
 
-def main(modelType, activationType, weightInitType, gradientType, epochs, batches, unroll, stateful):
+def main(modelType, activationType, weightInitType, gradientType, lossType, epochs, batches, unroll, stateful):
 
     train_x_states, train_t_states, oneHotmap, mapToChar = loadDataSet(stateful)
 
-    print_arg(modelType, activationType, weightInitType, gradientType, epochs, batches, train_x_states.shape, train_t_states.shape, unroll, stateful)
+    print_arg(modelType, activationType, weightInitType, gradientType, lossType, epochs, batches, train_x_states.shape, train_t_states.shape, unroll, stateful)
 
-    tars = create(modelType, activationType, weightInitType, train_x_states.shape[-2:], train_t_states.shape[-1], gradientType, unroll, stateful)
+    tars = create(modelType, activationType, weightInitType, train_x_states.shape[-2:], train_t_states.shape[-1], gradientType, lossType, unroll, stateful)
 
     train_span = train(tars, train_x_states, train_t_states, epochs, batches)
 
@@ -202,6 +202,7 @@ def parse_arg():
     parser = argparse.ArgumentParser(prog='RNN')
     parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='rmsProp', choices=['adam', 'sgd', 'rmsProp'], help='sample gradient type (default: rmsProp)')
+    parser.add_argument('-l', dest='lossType', type=str, default='softmax', choices=['softmax', 'sigmoid'], help='loss type (default: softmax)')
     parser.add_argument('-a', dest='activationType', type=str, default='tanh', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='he_normal', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: he_normal)')
     parser.add_argument('-e', dest='epochs', type=int, default=200, help='epochs (default: 200)')
@@ -223,4 +224,4 @@ if __name__ == "__main__":
     args = parse_arg()
 
     if args != None:
-        main(args.modelType, args.activationType, args.weightInitType, args.gradientType, args.epochs, args.batches, args.unroll, args.stateful)
+        main(args.modelType, args.activationType, args.weightInitType, args.gradientType, args.lossType, args.epochs, args.batches, args.unroll, args.stateful)

@@ -48,6 +48,15 @@ def weight_init_lecun_uniform():
     return {'type':'lecun', 'random':'uniform'}
 
 
+
+def loss_softmax():
+    return {'type':'softmax'}
+
+def loss_sigmoid():
+    return {'type':'sigmoid'}
+
+
+
 def template_complex(activation, weightInit, input_shape, classes):
 
     layers = [
@@ -96,3 +105,12 @@ def createGradientTemplate(gradientType):
     gradient = gradientTypeList[gradientType]
 
     return gradient()
+
+
+def createLossTemplate(lossType):
+
+    lossTypeList = {'softmax':loss_softmax, 'sigmoid':loss_sigmoid}
+
+    loss = lossTypeList[lossType]
+
+    return loss()

@@ -1,5 +1,6 @@
 import numpy as np
 from tars.gradient.creator import *
+from tars.loss.creator import *
 from tars.layer.input import *
 from tars.layer.convolution import *
 from tars.layer.max_pooling import *
@@ -9,14 +10,16 @@ from tars.layer.basicRNN import *
 
 
 class Tars:
-    def __init__(self, layersTemplate, gradientTemplate):
+    def __init__(self, layersTemplate, gradientTemplate, lossTemplate):
         self.layersTemplate = layersTemplate
         self.gradientTemplate = gradientTemplate
+        self.lossTemplate = lossTemplate
         self.head = None
         self.tail = None
+        self.loss = None
 
 
-    def createModel(self, layersTemplate, gradientTemplate):
+    def createModel(self, layersTemplate, gradientTemplate, lossTemplate):
 
         backward_layer = None
         head = None
@@ -41,8 +44,10 @@ class Tars:
                 head = backward_layer
 
         tail = backward_layer
+        loss = createLoss(lossTemplate)
 
-        return head, tail
+
+        return head, tail, loss
 
 
     def builtLayerList(self, head):
@@ -65,10 +70,11 @@ class Tars:
 
     def build(self):
 
-        head, tail = self.createModel(self.layersTemplate, self.gradientTemplate)
+        head, tail, loss = self.createModel(self.layersTemplate, self.gradientTemplate, self.lossTemplate)
 
         self.head = head
         self.tail = tail
+        self.loss = loss
 
         return self.builtLayerList(self.head)
 
@@ -98,38 +104,19 @@ class Tars:
         return self.trainCore(self.head, self.tail, batch_x, batch_t)
 
 
-    def softmax_forward(self, input):
-
-        output = np.exp(input)
-        sum = np.sum(output, axis=-1, keepdims = True)
-
-        return output / sum
-
-
-    def softmax_backward(self, error, target):
-
-        return (error - target)
-
-
-    def crossEntropyLoss(self, batch_y, batch_t):
-
-        loss = batch_t * np.log2(batch_y)
-        sum = np.sum(loss, axis= -1)
-
-        return -np.mean(sum)
-
-
     def trainCore(self, head, tail, batch_x, batch_t):
 
         batch_y = self.forward(head, batch_x)
 
-        batch_y = self.softmax_forward(batch_y)
+        batch_y = self.loss.forward(batch_y)
 
-        batch_e = self.softmax_backward(batch_y, batch_t)
+        loss = self.loss.loss(batch_y, batch_t)
+
+        batch_e = self.loss.backward(batch_y, batch_t)
 
         batch_e = self.backward(tail, batch_e)
 
-        return self.crossEntropyLoss(batch_y, batch_t)
+        return loss
 
 
     def forward(self, head, batch_x):
@@ -185,4 +172,4 @@ class Tars:
 
         batch_y = self.testCore(self.head, batch_x)
 
-        return self.softmax_forward(batch_y)
+        return self.loss.forward(batch_y)
