@@ -139,7 +139,7 @@ def parse_arg():
     parser.add_argument('-c', dest='classes', type=int, default='3', metavar="[1-10]", help='classes (default: 3)')
     parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='adam', choices=['adam', 'sgd', 'rmsProp'], help='gradient type (default: rmsProp)')
-    parser.add_argument('-l', dest='lossType', type=str, default='softmax', choices=['softmax', 'sigmoid'], help='loss type (default: softmax)')
+    parser.add_argument('-l', dest='lossType', type=str, default='categorical', choices=['categorical', 'binary'], help='loss type (default: categorical)')
     parser.add_argument('-a', dest='activationType', type=str, default='leakyRelu', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='he_normal', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: he_normal)')
     parser.add_argument('-e', dest='epochs', type=int, default=10, help='epochs (default: 10)')

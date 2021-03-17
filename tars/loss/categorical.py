@@ -2,10 +2,10 @@ import numpy as np
 from tars.loss.abs_loss import *
 
 
-class Softmax(ABSLoss):
+class Categorical(ABSLoss):
 
     def __init__(self):
-        super(Softmax, self).__init__()
+        super(Categorical, self).__init__()
 
 
     def forward(self, input):

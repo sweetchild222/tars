@@ -49,11 +49,11 @@ def weight_init_lecun_uniform():
 
 
 
-def loss_softmax():
-    return {'type':'softmax'}
+def loss_categorical():
+    return {'type':'categorical'}
 
-def loss_sigmoid():
-    return {'type':'sigmoid'}
+def loss_binary():
+    return {'type':'binary'}
 
 
 
@@ -109,7 +109,9 @@ def createGradientTemplate(gradientType):
 
 def createLossTemplate(lossType):
 
-    lossTypeList = {'softmax':loss_softmax, 'sigmoid':loss_sigmoid}
+    print(lossType)
+
+    lossTypeList = {'categorical':loss_categorical, 'binary':loss_binary}
 
     loss = lossTypeList[lossType]
 

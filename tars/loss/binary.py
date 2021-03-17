@@ -4,10 +4,10 @@ from tars.loss.abs_loss import *
 
 
 
-class Sigmoid(ABSLoss):
+class Binary(ABSLoss):
 
     def __init__(self):
-        super(Sigmoid, self).__init__()
+        super(Binary, self).__init__()
 
 
     def forward(self, input):
