@@ -55,6 +55,9 @@ def loss_categorical():
 def loss_binary():
     return {'type':'binary'}
 
+def loss_meansquare():
+    return {'type':'meansquare'}
+
 
 
 def template_complex(activation, weightInit, input_shape, classes):
@@ -109,9 +112,7 @@ def createGradientTemplate(gradientType):
 
 def createLossTemplate(lossType):
 
-    print(lossType)
-
-    lossTypeList = {'categorical':loss_categorical, 'binary':loss_binary}
+    lossTypeList = {'categorical':loss_categorical, 'binary':loss_binary, 'meansquare':loss_meansquare}
 
     loss = lossTypeList[lossType]
 
