@@ -1,5 +1,7 @@
 import numpy as np
+import math
 from tars.loss.abs_loss import *
+
 
 
 class Sigmoid(ABSLoss):
@@ -7,28 +9,28 @@ class Sigmoid(ABSLoss):
     def __init__(self):
         super(Sigmoid, self).__init__()
 
-        self.alpha = 0.0000000000001 #avoid divide zero
-
-        #self.alpha = 0.0
 
     def forward(self, input):
+
+        self.last_input = input
 
         return 1 / (1 + np.exp(-input))
 
 
     def backward(self, y, target):
 
-        negative = np.where(y == 0.0, self.alpha, y)
-        positive = np.where(y == 1.0, y -  self.alpha, y)
-
-        return np.where(target == 1, -1 / negative, 1 / (1 - positive))
+        return (y - target)
 
 
     def loss(self, y, target):
 
-        negative = np.where(y == 0.0, self.alpha, y)
-        positive = np.where(y == 1.0, y -  self.alpha, y)
+        e = math.exp(1)
 
-        loss = -target*np.log(negative) - (1 - target)* np.log(1 - positive)
+        input = self.last_input
+
+        positive = input - input*y + np.log(1 + (e**(-input)))
+        negative = -input*y + np.log((e**(input)) + 1)
+
+        loss = np.where(input >= 0.0, positive, negative)
 
         return np.mean(loss)
