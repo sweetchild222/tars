@@ -22,6 +22,6 @@ class Binary(ABSLoss):
 
     def loss(self, y, target):
 
-        loss = -(target*np.log2(y) + (1-target)*np.log2(1-y))
+        loss = -(target*np.log(y) + (1-target)*np.log(1-y))
 
         return np.mean(loss)
