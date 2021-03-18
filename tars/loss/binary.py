@@ -12,8 +12,6 @@ class Binary(ABSLoss):
 
     def forward(self, input):
 
-        self.last_input = input
-
         return 1 / (1 + np.exp(-input))
 
 
@@ -24,13 +22,6 @@ class Binary(ABSLoss):
 
     def loss(self, y, target):
 
-        e = math.exp(1)
-
-        input = self.last_input
-
-        positive = input - input*y + np.log(1 + (e**(-input)))
-        negative = -input*y + np.log((e**(input)) + 1)
-
-        loss = np.where(input >= 0.0, positive, negative)
+        loss = -(target*np.log2(y) + (1-target)*np.log2(1-y))
 
         return np.mean(loss)
