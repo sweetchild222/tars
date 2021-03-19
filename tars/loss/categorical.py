@@ -22,7 +22,7 @@ class Categorical(ABSLoss):
 
     def loss(self, y, target):
 
-        loss = target * np.log(y)
+        loss = -(target*np.log(y) + (1-target)*np.log(1-y))
         sum = np.sum(loss, axis= -1)
 
-        return -np.mean(sum)
+        return np.mean(sum)
