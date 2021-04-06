@@ -17,7 +17,7 @@ class BasicRNN(ABSLayer):
 
         self.weight_i_list = self.createWeightList(weight_init, (self.input_shape[-1], units), kernel_count)
         self.weight_h_list = self.createWeightList(weight_init, (units, units), kernel_count)
-        self.bias_list = [np.zeros((units)) for i in range(kernel_count)]
+        self.bias_list = [np.zeros((units)).copy()] * kernel_count
 
         self.gradient = self.gradientBind(gradient, self.weight_i_list, self.weight_h_list, self.bias_list)
 

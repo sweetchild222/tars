@@ -79,8 +79,6 @@ class Convolution(ABSLayer):
         (batches, input_height, input_width, input_colors) = input.shape
         (stride_y, stride_x) = self.strides
 
-        assert colors == input_colors, "filter miss match"
-
         output = np.zeros((batches, ) + self.outputShape())
 
         input_y = out_y = 0
