@@ -60,13 +60,12 @@ def loss_meansquare():
     return {'type':'meansquare'}
 
 
+
 def template_complex(activation, weightInit, input_shape, classes, unroll, stateful):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'basicRNN', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit, 'unroll':unroll, 'stateful':stateful}},
-        {'type':'basicRNN', 'parameter':{'units':128, 'activation':activation, 'weight_init':weightInit, 'unroll':unroll, 'stateful':stateful}},
-        {'type':'dense', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit}},
+        {'type':'lstm', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit, 'unroll':unroll, 'stateful':stateful}},
         {'type':'dense', 'parameter':{'units':128, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
 

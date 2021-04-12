@@ -7,6 +7,7 @@ from tars.layer.max_pooling import *
 from tars.layer.flatten import *
 from tars.layer.dense import *
 from tars.layer.basicRNN import *
+from tars.layer.lstm import *
 
 
 
@@ -21,8 +22,8 @@ def createLayers(layersTemplate, gradientTemplate):
         parameter = layer['parameter'] if 'parameter' in layer else {}
         parameter['backward_layer'] = backward_layer
 
-        layerClass = {'input':Input, 'convolution':Convolution, 'maxPooling':MaxPooling, 'flatten':Flatten, 'dense':Dense, 'basicRNN':BasicRNN}
-        gradientLayerClass = {'convolution':Convolution, 'dense':Dense, 'basicRNN':BasicRNN}
+        layerClass = {'input':Input, 'convolution':Convolution, 'maxPooling':MaxPooling, 'flatten':Flatten, 'dense':Dense, 'basicRNN':BasicRNN, 'lstm':LSTM}
+        gradientLayerClass = {'convolution':Convolution, 'dense':Dense, 'basicRNN':BasicRNN, 'lstm':LSTM}
         type = layer['type']
 
         if type in gradientLayerClass:
