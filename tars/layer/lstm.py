@@ -15,11 +15,8 @@ class LSTM(ABSLayer):
 
         kernel_count = 1 if self.unroll is False else self.input_shape[-2]
 
-        self.units = units
-        self.allUnits = units * 4
-
-        self.weight_i_list = self.createWeightList(weight_init, 4, (self.input_shape[-1], self.units), kernel_count)
-        self.weight_h_list = self.createWeightList(weight_init, 4, (self.units, self.units), kernel_count)
+        self.weight_i_list = self.createWeightList(weight_init, 4, (self.input_shape[-1], units), kernel_count)
+        self.weight_h_list = self.createWeightList(weight_init, 4, (units, units), kernel_count)
         self.bias_list = [np.zeros((units)) for i in range(kernel_count)]
 
         self.gradient = self.gradientBind(gradient, self.weight_i_list, self.weight_h_list, self.bias_list)
@@ -71,7 +68,6 @@ class LSTM(ABSLayer):
         self.h_test = None
         self.h_test_index = 0
 
-
     def test(self, input):
         pass
 
@@ -85,8 +81,8 @@ class LSTM(ABSLayer):
 
     def forwardCore(self, input):
 
-        aa = np.array([[[1,1,1],[1,1,1]], [[2,2,2],[2,2,2]], [[3,3,3],[3,3,3]]])
-        print(aa[-1].shape)
+        #aa = np.array([[[1,1,1],[1,1,1]], [[2,2,2],[2,2,2]], [[3,3,3],[3,3,3]]])
+        #print(aa[-1].shape)
 
         (batche, sequence_length, vocab_size) = input.shape
 
@@ -94,8 +90,8 @@ class LSTM(ABSLayer):
         self.cs_list = []
 
         if self.stateful is False or self.h_next is None:
-            self.h_next = np.zeros((batche, self.units))
-            self.cs_next = np.zeros((batche, self.units))
+            self.h_next = np.zeros((batche, self.getUnits()))
+            self.cs_next = np.zeros((batche, self.getUnits()))
 
         h_init = self.h_next
         cs_init = self.cs_next
@@ -166,7 +162,7 @@ class LSTM(ABSLayer):
 
     def getUnits(self):
 
-        return self.units
+        return self.weight_i_list[0].shape[-1]
 
 
     def outputShape(self):
