@@ -175,9 +175,27 @@ class LSTM(ABSLayer):
 
             d_recur_sets = self.recur_act_func[s].backward(np.array([d_i, d_f, d_o]))
             d_d_g = self.g_act_func[s].backward(d_g)
+            d_d_g = np.expand_dims(d_d_g, axis=0)
 
-            print(d_recur_sets.shape)
-            print(d_d_g.shape)
+            d_raw = np.concatenate((d_recur_sets, d_d_g), axis=0)
+            d_raw = np.expand_dims(d_raw, axis=-2)
+            last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
+            h_prev = np.expand_dims(self.h_list[s], axis=-1)
+
+            wi_delta = np.matmul(last_i, d_raw)
+            wh_delta = np.matmul(h_prev, d_raw)
+
+            print(wi_delta.shape)
+            print(wh_delta.shape)
+
+            #d_d_g = np.expand_dims(d_d_g, axis=0)
+            #print(d_d_g.shape)
+
+            #wi_delta = np.matmul(np.expand_dims(self.last_input[:, s,:], axis=-1), np.expand_dims(d_h_raw, axis=1))
+            #wh_delta = np.matmul(np.expand_dims(self.h_list[s], axis=-1), np.expand_dims(d_h_raw, axis=1))
+
+            #print(d_recur_sets.shape)
+            #print(d_d_g.shape)
 
 
 

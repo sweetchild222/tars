@@ -159,8 +159,12 @@ class BasicRNN(ABSLayer):
             d_h_raw = self.act_func[s].backward(err)
             d_h_prev = np.matmul(d_h_raw, self.weight_h_list[kernel_index].T)
 
-            wi_delta = np.matmul(np.expand_dims(self.last_input[:, s,:], axis=-1), np.expand_dims(d_h_raw, axis=1))
-            wh_delta = np.matmul(np.expand_dims(self.h_list[s], axis=-1), np.expand_dims(d_h_raw, axis=1))
+            d_h_raw = np.expand_dims(d_h_raw, axis=1)
+            last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
+            h_prev = np.expand_dims(self.h_list[s], axis=-1)
+
+            wi_delta = np.matmul(last_i, d_h_raw)
+            wh_delta = np.matmul(h_prev, d_h_raw)
 
             wi_delta_list.append(wi_delta)
             wh_delta_list.append(wh_delta)
