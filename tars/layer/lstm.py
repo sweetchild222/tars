@@ -18,9 +18,9 @@ class LSTM(ABSLayer):
         self.units = units
         self.allUnits = units * 4
 
-        self.weight_i_list = self.createWeightList(weight_init, (self.input_shape[-1], self.allUnits), kernel_count)
-        self.weight_h_list = self.createWeightList(weight_init, (self.units, self.allUnits), kernel_count)
-        self.bias_list = [np.zeros((self.allUnits)).copy()] * kernel_count
+        self.weight_i_list = self.createWeightList(weight_init, 4, (self.input_shape[-1], self.units), kernel_count)
+        self.weight_h_list = self.createWeightList(weight_init, 4, (self.units, self.units), kernel_count)
+        self.bias_list = [np.zeros((units)) for i in range(kernel_count)]
 
         self.gradient = self.gradientBind(gradient, self.weight_i_list, self.weight_h_list, self.bias_list)
 
@@ -41,13 +41,17 @@ class LSTM(ABSLayer):
         return gradient
 
 
-    def createWeightList(self, weight_init, size, kernel_count):
+    def createWeightList(self, weight_init, sets, size, kernel_count):
 
         list = []
 
         for i in range(kernel_count):
-            weight = createWeight(weight_init, size[0], size[1], size)
-            list.append(weight)
+            weight_sets = []
+            for s in range(sets):
+                weight = createWeight(weight_init, size[0], size[1], size)
+                weight_sets.append(weight)
+
+            list.append(np.array(weight_sets))
 
         return list
 
@@ -81,6 +85,9 @@ class LSTM(ABSLayer):
 
     def forwardCore(self, input):
 
+        aa = np.array([[[1,1,1],[1,1,1]], [[2,2,2],[2,2,2]], [[3,3,3],[3,3,3]]])
+        print(aa[-1].shape)
+
         (batche, sequence_length, vocab_size) = input.shape
 
         self.h_list = []
@@ -102,17 +109,21 @@ class LSTM(ABSLayer):
 
             kernel_index = 0 if self.unroll is False else s
 
-            matmul_i = np.matmul(i, self.weight_i_list[kernel_index])
-            matmul_h = np.matmul(self.h_next, self.weight_h_list[kernel_index])
+            weight_i = self.weight_i_list[kernel_index]
+            weight_h = self.weight_h_list[kernel_index]
+            bias = self.bias_list[kernel_index]
 
-            matmul_calc = matmul_i + matmul_h + self.bias_list[kernel_index]
+            matmul_i = np.matmul(i, weight_i)
+            matmul_h = np.matmul(self.h_next, weight_h)
 
-            recur_calc = self.recur_act_func[s].forward(matmul_calc[:,:self.units * 3]).reshape(matmul_calc.shape[:-1] + (3, -1))
+            matmul_calc = matmul_i + matmul_h + bias
 
-            g_value = self.g_act_func[s].forward(matmul_calc[:,self.units * 3:])
-            i_value = recur_calc[:,0]
-            f_value = recur_calc[:,1]
-            o_value = recur_calc[:,2]
+            g_value = self.g_act_func[s].forward(matmul_calc[-1])
+
+            recur_calc = self.recur_act_func[s].forward(matmul_calc[:-1])
+            i_value = recur_calc[0]
+            f_value = recur_calc[1]
+            o_value = recur_calc[2]
 
             self.cs_next = (f_value * self.cs_next) + (i_value * g_value)
             self.cs_list.append(self.cs_next)
