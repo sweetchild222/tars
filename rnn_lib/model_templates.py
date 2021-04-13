@@ -65,7 +65,7 @@ def template_complex(activation, weightInit, input_shape, classes, unroll, state
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'lstm', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit, 'unroll':unroll, 'stateful':stateful}},
+        {'type':'lstm', 'parameter':{'units':256, 'activation':activation_tanh(), 'recurrent_activation':activation_sigmoid(), 'weight_init':weightInit, 'unroll':unroll, 'stateful':stateful}},
         {'type':'dense', 'parameter':{'units':128, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
 

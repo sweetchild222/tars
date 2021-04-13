@@ -116,7 +116,7 @@ class BasicRNN(ABSLayer):
 
         h_init = self.h_next
 
-        self.activationList = [createActivation(self.activation) for i in range(sequence_length)]
+        self.act_func = [createActivation(self.activation) for i in range(sequence_length)]
 
         for s in range(sequence_length):
             i = input[:,s,:]
@@ -126,7 +126,7 @@ class BasicRNN(ABSLayer):
             matmul_i = np.matmul(i, self.weight_i_list[kernel_index])
             matmul_h = np.matmul(self.h_next, self.weight_h_list[kernel_index])
 
-            activation = self.activationList[s]
+            activation = self.act_func[s]
 
             self.h_next = activation.forward(matmul_i + matmul_h + self.bias_list[kernel_index])
 
@@ -134,7 +134,7 @@ class BasicRNN(ABSLayer):
 
         output = np.swapaxes(np.array(self.h_list), 1, 0)
 
-        self.activationList.insert(0, createActivation(self.activation))
+        self.act_func.insert(0, createActivation(self.activation))
         self.h_list.insert(0, h_init)
 
         return output
@@ -154,7 +154,7 @@ class BasicRNN(ABSLayer):
 
             kernel_index = 0 if self.unroll is False else s
 
-            activation = self.activationList[s + 1]
+            activation = self.act_func[s + 1]
 
             h_prev = self.h_list[s]
 
