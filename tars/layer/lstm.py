@@ -78,7 +78,6 @@ class LSTM(ABSLayer):
 
         return self.forwardCore(input)
 
-
     def forwardCore(self, input):
 
         #aa = np.array([[[1,1,1],[1,1,1]], [[2,2,2],[2,2,2]], [[3,3,3],[3,3,3]]])
@@ -87,21 +86,22 @@ class LSTM(ABSLayer):
         (batche, sequence_length, vocab_size) = input.shape
 
         self.h_list = []
-        self.cs_list = []
+        self.c_list = []
+        self.recur_sets_list = []
+        self.g_list = []
 
         if self.stateful is False or self.h_next is None:
             self.h_next = np.zeros((batche, self.getUnits()))
-            self.cs_next = np.zeros((batche, self.getUnits()))
+            self.c_next = np.zeros((batche, self.getUnits()))
 
         h_init = self.h_next
-        cs_init = self.cs_next
+        c_init = self.c_next
 
         self.recur_act_func = [createActivation(self.recurrent_activation) for i in range(sequence_length)]
         self.g_act_func = [createActivation(self.activation) for i in range(sequence_length)]
         self.output_act_func = [createActivation(self.activation) for i in range(sequence_length)]
 
         for s in range(sequence_length):
-            i = input[:,s,:]
 
             kernel_index = 0 if self.unroll is False else s
 
@@ -109,37 +109,74 @@ class LSTM(ABSLayer):
             weight_h = self.weight_h_list[kernel_index]
             bias = self.bias_list[kernel_index]
 
-            matmul_i = np.matmul(i, weight_i)
+            matmul_i = np.matmul(input[:,s,:], weight_i)
             matmul_h = np.matmul(self.h_next, weight_h)
 
             matmul_calc = matmul_i + matmul_h + bias
 
             g_value = self.g_act_func[s].forward(matmul_calc[-1])
+            self.g_list.append(g_value)
 
-            recur_calc = self.recur_act_func[s].forward(matmul_calc[:-1])
-            i_value = recur_calc[0]
-            f_value = recur_calc[1]
-            o_value = recur_calc[2]
+            recur_value_sets = self.recur_act_func[s].forward(matmul_calc[:-1])
+            self.recur_sets_list.append(recur_value_sets)
+            i_value = recur_value_sets[0]
+            f_value = recur_value_sets[1]
+            o_value = recur_value_sets[2]
 
-            self.cs_next = (f_value * self.cs_next) + (i_value * g_value)
-            self.cs_list.append(self.cs_next)
+            self.c_next = (f_value * self.c_next) + (i_value * g_value)
+            self.c_list.append(self.c_next)
 
-            self.h_next = o_value * self.output_act_func[s].forward(self.cs_next)
+            self.h_next = o_value * self.output_act_func[s].forward(self.c_next)
             self.h_list.append(self.h_next)
 
         output = np.swapaxes(np.array(self.h_list), 1, 0)
 
-        self.recur_act_func.insert(0, createActivation(self.recurrent_activation))
-        self.g_act_func.insert(0, createActivation(self.activation))
-        self.output_act_func.insert(0, createActivation(self.activation))
-
         self.h_list.insert(0, h_init)
-        self.cs_list.insert(0, cs_init)
+        self.c_list.insert(0, c_init)
 
         return output
 
 
     def backward(self, error):
+
+        (batche, sequence_length, units) = error.shape
+
+        d_h_prev = np.zeros((batche, self.getUnits()))
+        d_c_prev = np.zeros((batche, self.getUnits()))
+
+        wi_delta_list = []
+        wh_delta_list = []
+        b_delta_list = []
+
+        for s in range(sequence_length - 1, -1, -1):
+
+            kernel_index = 0 if self.unroll is False else s
+
+            g_value = self.g_list[s]
+
+            recur_value_sets = self.recur_sets_list[s]
+            i_value = recur_value_sets[0]
+            f_value = recur_value_sets[1]
+            o_value = recur_value_sets[2]
+
+            i = np.expand_dims(self.last_input[:, s,:], axis=-1)
+
+            err = error[:, s,:] + d_h_prev
+
+            d_c = d_c_prev + self.output_act_func[s].backward(err) * o_value
+            d_c_prev = d_c * f_value
+
+            d_i = d_c * g_value
+            d_f = d_c * self.c_list[s]
+
+            
+
+
+
+
+
+
+        a = a / 0
 
         return error
 

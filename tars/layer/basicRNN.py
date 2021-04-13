@@ -119,22 +119,22 @@ class BasicRNN(ABSLayer):
         self.act_func = [createActivation(self.activation) for i in range(sequence_length)]
 
         for s in range(sequence_length):
-            i = input[:,s,:]
 
             kernel_index = 0 if self.unroll is False else s
 
-            matmul_i = np.matmul(i, self.weight_i_list[kernel_index])
-            matmul_h = np.matmul(self.h_next, self.weight_h_list[kernel_index])
+            weight_i = self.weight_i_list[kernel_index]
+            weight_h = self.weight_h_list[kernel_index]
+            bias = self.bias_list[kernel_index]
 
-            activation = self.act_func[s]
+            matmul_i = np.matmul(input[:,s,:], weight_i)
+            matmul_h = np.matmul(self.h_next, weight_h)
 
-            self.h_next = activation.forward(matmul_i + matmul_h + self.bias_list[kernel_index])
+            self.h_next = self.act_func[s].forward(matmul_i + matmul_h + bias)
 
             self.h_list.append(self.h_next)
 
         output = np.swapaxes(np.array(self.h_list), 1, 0)
 
-        self.act_func.insert(0, createActivation(self.activation))
         self.h_list.insert(0, h_init)
 
         return output
@@ -154,22 +154,13 @@ class BasicRNN(ABSLayer):
 
             kernel_index = 0 if self.unroll is False else s
 
-            activation = self.act_func[s + 1]
+            err = error[:, s,:] + d_h_prev
 
-            h_prev = self.h_list[s]
-
-            i = self.last_input[:, s,:]
-            i = np.expand_dims(i, axis=-1)
-
-            err = error[:, s,:]
-
-            back_h_error = err + d_h_prev
-
-            d_h_raw = activation.backward(back_h_error)
+            d_h_raw = self.act_func[s].backward(err)
             d_h_prev = np.matmul(d_h_raw, self.weight_h_list[kernel_index].T)
 
-            wi_delta = np.matmul(i, np.expand_dims(d_h_raw, axis=1))
-            wh_delta = np.matmul(np.expand_dims(h_prev, axis=-1), np.expand_dims(d_h_raw, axis=1))
+            wi_delta = np.matmul(np.expand_dims(self.last_input[:, s,:], axis=-1), np.expand_dims(d_h_raw, axis=1))
+            wh_delta = np.matmul(np.expand_dims(self.h_list[s], axis=-1), np.expand_dims(d_h_raw, axis=1))
 
             wi_delta_list.append(wi_delta)
             wh_delta_list.append(wh_delta)
