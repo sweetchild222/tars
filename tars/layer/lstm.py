@@ -89,6 +89,7 @@ class LSTM(ABSLayer):
         self.c_list = []
         self.recur_sets_list = []
         self.g_list = []
+        self.z_list = []
 
         if self.stateful is False or self.h_next is None:
             self.h_next = np.zeros((batche, self.getUnits()))
@@ -117,16 +118,19 @@ class LSTM(ABSLayer):
             g_value = self.g_act_func[s].forward(matmul_calc[-1])
             self.g_list.append(g_value)
 
-            recur_value_sets = self.recur_act_func[s].forward(matmul_calc[:-1])
-            self.recur_sets_list.append(recur_value_sets)
-            i_value = recur_value_sets[0]
-            f_value = recur_value_sets[1]
-            o_value = recur_value_sets[2]
+            recur_sets = self.recur_act_func[s].forward(matmul_calc[:-1])
+            self.recur_sets_list.append(recur_sets)
+            i_value = recur_sets[0]
+            f_value = recur_sets[1]
+            o_value = recur_sets[2]
 
             self.c_next = (f_value * self.c_next) + (i_value * g_value)
             self.c_list.append(self.c_next)
 
-            self.h_next = o_value * self.output_act_func[s].forward(self.c_next)
+            z_value = self.output_act_func[s].forward(self.c_next)
+            self.z_list.append(z_value)
+
+            self.h_next = o_value * z_value
             self.h_list.append(self.h_next)
 
         output = np.swapaxes(np.array(self.h_list), 1, 0)
@@ -154,22 +158,35 @@ class LSTM(ABSLayer):
 
             g_value = self.g_list[s]
 
-            recur_value_sets = self.recur_sets_list[s]
-            i_value = recur_value_sets[0]
-            f_value = recur_value_sets[1]
-            o_value = recur_value_sets[2]
-
-            i = np.expand_dims(self.last_input[:, s,:], axis=-1)
+            recur_sets = self.recur_sets_list[s]
+            i_value = recur_sets[0]
+            f_value = recur_sets[1]
+            o_value = recur_sets[2]
 
             err = error[:, s,:] + d_h_prev
 
             d_c = d_c_prev + self.output_act_func[s].backward(err) * o_value
             d_c_prev = d_c * f_value
 
+            d_g = d_c * i_value
             d_i = d_c * g_value
             d_f = d_c * self.c_list[s]
+            d_o = err * self.z_list[s]
 
-            
+            d_recur_sets = self.recur_act_func[s].backward(np.array([d_i, d_f, d_o]))
+            d_d_g = self.g_act_func[s].backward(d_g)
+
+            print(d_recur_sets.shape)
+            print(d_d_g.shape)
+
+
+
+
+            #d_d_g =
+
+
+
+
 
 
 
