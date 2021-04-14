@@ -24,7 +24,8 @@ class LSTM(ABSLayer):
         self.gradient = self.gradientBind(gradient, self.weight_i_list, self.weight_h_list, self.bias_list)
 
         self.h_test = None
-        self.h_test_index = 0
+        self.c_test = None
+        self.test_proceed = 0
 
         self.h_next = None
 
@@ -91,12 +92,65 @@ class LSTM(ABSLayer):
 
     def resetState(self):
 
-        self.h_next = None
         self.h_test = None
-        self.h_test_index = 0
+        self.c_test = None
+        self.test_proceed = 0
+
+        self.h_next = None
+
 
     def test(self, input):
-        pass
+
+        (sequence_length, vocab_size) = self.input_shape
+
+        (batche, cur_sequence_length, cur_vocab_size) = input.shape
+
+        h_list = []
+
+        if self.stateful is False or self.h_test is None or self.c_test is None:
+            self.h_test = np.zeros((batche, self.getUnits()))
+            self.c_test = np.zeros((batche, self.getUnits()))
+
+        recur_act_func = [createActivation(self.recurrent_activation) for i in range(cur_sequence_length)]
+        g_act_func = [createActivation(self.activation) for i in range(cur_sequence_length)]
+        output_act_func = [createActivation(self.activation) for i in range(cur_sequence_length)]
+
+        for s in range(cur_sequence_length):
+
+            kernel_index = 0 if self.unroll is False else s
+
+            weight_i = self.weight_i_list[kernel_index]
+            weight_h = self.weight_h_list[kernel_index]
+            bias = self.bias_list[kernel_index]
+
+            matmul_i = np.matmul(input[:,s,:], weight_i)
+            matmul_h = np.matmul(self.h_test, weight_h)
+
+            batch_bias = np.array([bias] * batche).reshape((self.sets_count, batche, -1))
+
+            matmul_calc = matmul_i + matmul_h + batch_bias
+
+            g_value = g_act_func[s].forward(matmul_calc[-1])
+
+            recur_sets = recur_act_func[s].forward(matmul_calc[:-1])
+            i_value = recur_sets[0]
+            f_value = recur_sets[1]
+            o_value = recur_sets[2]
+
+            self.c_test = (f_value * self.c_test) + (i_value * g_value)
+
+            z_value = output_act_func[s].forward(self.c_test)
+
+            self.h_test = o_value * z_value
+            h_list.append(self.h_test)
+
+            self.test_proceed = (self.test_proceed + 1) % cur_sequence_length
+
+            if self.stateful is False and self.test_proceed == 0:
+                self.h_test = np.zeros((batche, self.getUnits()))
+                self.c_test = np.zeros((batche, self.getUnits()))
+
+        return np.swapaxes(np.array(h_list), 1, 0)
 
 
     def forward(self, input):
@@ -206,17 +260,17 @@ class LSTM(ABSLayer):
             d_d_g = np.expand_dims(d_d_g, axis=0)
 
             d_h_raw = np.concatenate((d_d_recur_sets, d_d_g), axis=0)
-            d_h_raw_expands = np.expand_dims(d_h_raw, axis=-2)
+            d_h_raw_expand = np.expand_dims(d_h_raw, axis=-2)
 
             last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
             h_prev = np.expand_dims(self.h_list[s], axis=-1)
 
-            wi_delta = np.matmul(last_i, d_h_raw_expands)
-            wh_delta = np.matmul(h_prev, d_h_raw_expands)
+            wi_delta = np.matmul(last_i, d_h_raw_expand)
+            wh_delta = np.matmul(h_prev, d_h_raw_expand)
 
             wi_delta_list.append(wi_delta)
             wh_delta_list.append(wh_delta)
-            b_delta_list.append(d_h_raw_expands)
+            b_delta_list.append(d_h_raw_expand)
 
             weight_h = self.weight_h_list[kernel_index]
             weight_i = self.weight_i_list[kernel_index]

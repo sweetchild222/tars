@@ -77,7 +77,7 @@ def template_light(activation, weightInit, input_shape, classes, unroll, statefu
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
         {'type':'basicRNN', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit, 'unroll':unroll, 'stateful':stateful}},
-        {'type':'dense', 'parameter':{'units':128, 'activation':activation, 'weight_init':weightInit}},
+        {'type':'dense', 'parameter':{'units':64, 'activation':activation, 'weight_init':weightInit}},
         {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
 
     return layers

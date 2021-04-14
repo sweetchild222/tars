@@ -61,7 +61,6 @@ class BasicRNN(ABSLayer):
     def resetState(self):
 
         self.h_next = None
-
         self.h_test = None
         self.test_proceed = 0
 
@@ -161,6 +160,8 @@ class BasicRNN(ABSLayer):
             weight_h = self.weight_h_list[kernel_index]
             weight_i = self.weight_i_list[kernel_index]
 
+            h_prev = self.h_list[s]
+
             err = error[:, s,:] + d_h_prev
 
             d_h_raw = self.act_func[s].backward(err)
@@ -169,12 +170,12 @@ class BasicRNN(ABSLayer):
             back_error = np.matmul(err, weight_i.T)
             back_layer_error_list.append(back_error)
 
-            d_h_raw = np.expand_dims(d_h_raw, axis=1)
+            d_h_raw_expand = np.expand_dims(d_h_raw, axis=1)
             last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
-            h_prev = np.expand_dims(self.h_list[s], axis=-1)
+            h_prev = np.expand_dims(h_prev, axis=-1)
 
-            wi_delta = np.matmul(last_i, d_h_raw)
-            wh_delta = np.matmul(h_prev, d_h_raw)
+            wi_delta = np.matmul(last_i, d_h_raw_expand)
+            wh_delta = np.matmul(h_prev, d_h_raw_expand)
 
             wi_delta_list.append(wi_delta)
             wh_delta_list.append(wh_delta)
