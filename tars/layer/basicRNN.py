@@ -22,7 +22,7 @@ class BasicRNN(ABSLayer):
         self.gradient = self.gradientBind(gradient, self.weight_i_list, self.weight_h_list, self.bias_list)
 
         self.h_test = None
-        self.h_test_index = 0
+        self.test_proceed = 0
 
         self.h_next = None
 
@@ -61,8 +61,9 @@ class BasicRNN(ABSLayer):
     def resetState(self):
 
         self.h_next = None
+
         self.h_test = None
-        self.h_test_index = 0
+        self.test_proceed = 0
 
 
     def test(self, input):
@@ -73,26 +74,28 @@ class BasicRNN(ABSLayer):
 
         h_test_list = []
 
-        if (self.stateful is False and self.h_test_index == 0) or self.h_test is None:
+        if (self.stateful is False and self.test_proceed == 0) or self.h_test is None:
             self.h_test = np.zeros((batche, self.getUnits()))
 
         activation = createActivation(self.activation)
 
         for s in range(cur_sequence_length):
 
-            i = input[:,s,:]
+            kernel_index = 0 if self.unroll is False else self.test_proceed
 
-            kernel_index = 0 if self.unroll is False else self.h_test_index
+            weight_i = self.weight_i_list[kernel_index]
+            weight_h = self.weight_h_list[kernel_index]
+            bias = self.bias_list[kernel_index]
 
-            matmul_i = np.matmul(i, self.weight_i_list[kernel_index])
-            matmul_h = np.matmul(self.h_test, self.weight_h_list[kernel_index])
+            matmul_i = np.matmul(input[:,s,:], weight_i)
+            matmul_h = np.matmul(self.h_test, weight_h)
 
-            self.h_test = activation.forward(matmul_i + matmul_h + self.bias_list[kernel_index])
+            self.h_test = activation.forward(matmul_i + matmul_h + bias)
             h_test_list.append(self.h_test)
 
-            self.h_test_index = (self.h_test_index + 1) % sequence_length
+            self.test_proceed = (self.test_proceed + 1) % sequence_length
 
-            if self.stateful is False and self.h_test_index == 0:
+            if self.stateful is False and self.test_proceed == 0:
                 self.h_test = np.zeros((batche, self.getUnits()))
 
         return np.swapaxes(np.array(h_test_list), 1, 0)
@@ -151,17 +154,19 @@ class BasicRNN(ABSLayer):
         b_delta_list = []
         back_layer_error_list = []
 
-
         for s in range(sequence_length - 1, -1, -1):
 
             kernel_index = 0 if self.unroll is False else s
 
+            weight_h = self.weight_h_list[kernel_index]
+            weight_i = self.weight_i_list[kernel_index]
+
             err = error[:, s,:] + d_h_prev
 
             d_h_raw = self.act_func[s].backward(err)
-            d_h_prev = np.matmul(d_h_raw, self.weight_h_list[kernel_index].T)
+            d_h_prev = np.matmul(d_h_raw, weight_h.T)
 
-            back_error = np.matmul(err, self.weight_i_list[kernel_index].T)
+            back_error = np.matmul(err, weight_i.T)
             back_layer_error_list.append(back_error)
 
             d_h_raw = np.expand_dims(d_h_raw, axis=1)
