@@ -107,7 +107,7 @@ class LSTM(ABSLayer):
 
         h_list = []
 
-        if self.stateful is False or self.h_test is None or self.c_test is None:
+        if (self.stateful is False and self.test_proceed == 0) or self.h_test is None or self.c_test is None:
             self.h_test = np.zeros((batche, self.getUnits()))
             self.c_test = np.zeros((batche, self.getUnits()))
 
@@ -144,7 +144,7 @@ class LSTM(ABSLayer):
             self.h_test = o_value * z_value
             h_list.append(self.h_test)
 
-            self.test_proceed = (self.test_proceed + 1) % cur_sequence_length
+            self.test_proceed = (self.test_proceed + 1) % sequence_length
 
             if self.stateful is False and self.test_proceed == 0:
                 self.h_test = np.zeros((batche, self.getUnits()))
