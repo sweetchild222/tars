@@ -105,10 +105,8 @@ class LSTM(ABSLayer):
 
         return self.forwardCore(input)
 
-    def forwardCore(self, input):
 
-        #aa = np.array([[[1,1,1],[1,1,1]], [[2,2,2],[2,2,2]], [[3,3,3],[3,3,3]]])
-        #print(aa[-1].shape)
+    def forwardCore(self, input):
 
         (batche, sequence_length, vocab_size) = input.shape
 
@@ -202,21 +200,27 @@ class LSTM(ABSLayer):
             d_f = d_c * self.c_list[s]
             d_o = err * self.z_list[s]
 
-            d_recur_sets = self.recur_act_func[s].backward(np.array([d_i, d_f, d_o]))
+            d_d_recur_sets = self.recur_act_func[s].backward(np.array([d_i, d_f, d_o]))
             d_d_g = self.g_act_func[s].backward(d_g)
             d_d_g = np.expand_dims(d_d_g, axis=0)
 
-            d_raw = np.concatenate((d_recur_sets, d_d_g), axis=0)
-            d_raw = np.expand_dims(d_raw, axis=-2)
+            d_raw = np.concatenate((d_d_recur_sets, d_d_g), axis=0)
+            d_raw_expands = np.expand_dims(d_raw, axis=-2)
+
             last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
             h_prev = np.expand_dims(self.h_list[s], axis=-1)
 
-            wi_delta = np.matmul(last_i, d_raw)
-            wh_delta = np.matmul(h_prev, d_raw)
+            wi_delta = np.matmul(last_i, d_raw_expands)
+            wh_delta = np.matmul(h_prev, d_raw_expands)
 
             wi_delta_list.append(wi_delta)
             wh_delta_list.append(wh_delta)
-            b_delta_list.append(d_raw)
+            b_delta_list.append(d_raw_expands)
+
+            weight_h_t = self.weight_h_list[kernel_index].swapaxes(-2, -1)
+
+            d_h_prev = np.matmul(d_raw, weight_h_t)
+            d_h_prev = np.sum(d_h_prev, axis=0)
 
         self.gradientUpdate(np.array(wi_delta_list), np.array(wh_delta_list), np.array(b_delta_list))
 
