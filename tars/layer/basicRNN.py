@@ -149,6 +149,8 @@ class BasicRNN(ABSLayer):
         wi_delta_list = []
         wh_delta_list = []
         b_delta_list = []
+        back_layer_error_list = []
+
 
         for s in range(sequence_length - 1, -1, -1):
 
@@ -158,6 +160,9 @@ class BasicRNN(ABSLayer):
 
             d_h_raw = self.act_func[s].backward(err)
             d_h_prev = np.matmul(d_h_raw, self.weight_h_list[kernel_index].T)
+
+            back_error = np.matmul(err, self.weight_i_list[kernel_index].T)
+            back_layer_error_list.append(back_error)
 
             d_h_raw = np.expand_dims(d_h_raw, axis=1)
             last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
@@ -172,7 +177,8 @@ class BasicRNN(ABSLayer):
 
         self.gradientUpdate(np.array(wi_delta_list), np.array(wh_delta_list), np.array(b_delta_list))
 
-        back_layer_error = np.matmul(error, self.weight_i_list[kernel_index].T)
+        back_layer_error = np.array(back_layer_error_list)
+        back_layer_error = back_layer_error.swapaxes(1, 0)
 
         return back_layer_error
 
