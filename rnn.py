@@ -200,7 +200,7 @@ def main(modelType, activationType, weightInitType, gradientType, lossType, epoc
 def parse_arg():
 
     parser = argparse.ArgumentParser(prog='RNN')
-    parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
+    parser.add_argument('-m', dest='modelType', type=str, default='basic', choices=['basic', 'lstm'], help='sample model type (default:basic)')
     parser.add_argument('-g', dest='gradientType', type=str, default='rmsProp', choices=['adam', 'sgd', 'rmsProp'], help='sample gradient type (default: rmsProp)')
     parser.add_argument('-l', dest='lossType', type=str, default='categorical', choices=['categorical', 'binary', 'meansquare'], help='loss type (default: categorical)')
     parser.add_argument('-a', dest='activationType', type=str, default='tanh', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
