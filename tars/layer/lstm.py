@@ -293,27 +293,25 @@ class LSTM(ABSLayer):
 
     def gradientUpdate(self, wi_delta_list, wh_delta_list, b_delta_list):
 
-        updateList = []
+        wi_list = []
+        wh_list = []
+        b_list = []
 
-        if self.unroll is True:
-            updateList += [wi_delta for wi_delta in wi_delta_list]
-            updateList += [wh_delta for wh_delta in wh_delta_list]
-            updateList += [b_delta for b_delta in b_delta_list]
-        else:
+        for i in range(self.sets_count):
+            wi_delta = wi_delta_list[:, i]
+            wh_delta = wh_delta_list[:, i]
+            b_delta = b_delta_list[:, i]
 
-            for i in range(self.sets_count):
-                wi_delta = wi_delta_list[:, i]
-                updateList.append(wi_delta.reshape((-1, ) + wi_delta.shape[-2:]))
+            if self.unroll is True:
+                wi_list += [wi for wi in wi_delta]
+                wh_list += [wh for wh in wh_delta]
+                b_list += [b for b in b_delta]
+            else:
+                wi_list.append(wi_delta.reshape((-1, ) + wi_delta.shape[-2:]))
+                wh_list.append(wh_delta.reshape((-1, ) + wh_delta.shape[-2:]))
+                b_list.append(b_delta.reshape((-1, ) + b_delta.shape[-2:]))
 
-            for i in range(self.sets_count):
-                wh_delta = wh_delta_list[:, i]
-                updateList.append(wh_delta.reshape((-1, ) + wh_delta.shape[-2:]))
-
-            for i in range(self.sets_count):
-                b_delta = b_delta_list[:, i]
-                updateList.append(b_delta.reshape((-1, ) + b_delta.shape[-2:]))
-
-        self.gradient.update(updateList)
+        self.gradient.update(wi_list + wh_list + b_list)
 
 
     def getUnits(self):
