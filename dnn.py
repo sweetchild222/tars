@@ -135,7 +135,7 @@ def parse_arg():
     parser.add_argument('-w', dest='weightInitType', type=str, default='glorot_uniform', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: glorot_uniform)')
     parser.add_argument('-e', dest='epochs', type=int, default=30, help='epochs (default: 30)')
     parser.add_argument('-b', dest='batches', type=int, default=100, help='batches (default: 100)')
-    parser.add_argument('-d', dest='draw_epoch_term', type=int, default=10, help='draw epoch term (default: 10)')
+    parser.add_argument('-d', dest='draw_epoch_term', type=int, default=30, help='draw epoch term (default: 30)')
 
     args = parser.parse_args()
 
