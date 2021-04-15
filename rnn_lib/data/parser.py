@@ -4,8 +4,8 @@ text = open('original_data.txt', 'r').read()
 string_list = text.split('\n\n')
 
 i = 0
-data_count = 50
-max_data_length = 50
+data_count = 10
+max_data_length = 40
 data_list = {}
 phase_count = 3
 

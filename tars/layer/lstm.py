@@ -3,6 +3,7 @@ from tars.layer.abs_layer import *
 from tars.weight_init.weight_init import *
 from tars.activation.creator import *
 
+
 class LSTM(ABSLayer):
 
     def __init__(self, units, activation, recurrent_activation, weight_init, backward_layer, gradient, unroll, stateful):
@@ -117,7 +118,7 @@ class LSTM(ABSLayer):
 
         for s in range(cur_sequence_length):
 
-            kernel_index = 0 if self.unroll is False else s
+            kernel_index = 0 if self.unroll is False else self.test_proceed
 
             weight_i = self.weight_i_list[kernel_index]
             weight_h = self.weight_h_list[kernel_index]
