@@ -60,13 +60,12 @@ def loss_meansquare():
 
 
 
-def template_complex(activation, weightInit, input_shape, classes):
+
+def modelTemplate(activation, weightInit, input_shape, classes):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'convolution', 'parameter':{'filters':8, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        {'type':'convolution', 'parameter':{'filters':8, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
+        {'type':'convolution', 'parameter':{'filters':5, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
         {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
         {'type':'flatten'},
         {'type':'dense', 'parameter':{'units':128, 'activation':activation, 'weight_init':weightInit}},
@@ -75,30 +74,15 @@ def template_complex(activation, weightInit, input_shape, classes):
     return layers
 
 
-def template_light(activation, weightInit, input_shape, classes):
+def createModelTemplate(activationType, weightInitType, input_shape, classes):
 
-    layers = [
-        {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
-        {'type':'flatten'},
-        {'type':'dense', 'parameter':{'units':64, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
-
-    return layers
-
-
-def createLayersTemplate(modelType, activationType, weightInitType, input_shape, classes):
-
-    modelTypeList = {'light':template_light, 'complex': template_complex}
     activationTypeList = {'elu':activation_elu, 'relu':activation_relu, 'leakyRelu':activation_leakyRelu, 'sigmoid':activation_sigmoid, 'tanh':activation_tanh, 'linear':activation_linear}
     weightInitTypeList = {'glorot_normal':weight_init_glorot_normal, 'glorot_uniform':weight_init_glorot_uniform, 'he_normal':weight_init_he_normal, 'he_uniform':weight_init_he_uniform, 'lecun_normal':weight_init_lecun_normal, 'lecun_uniform':weight_init_lecun_uniform}
 
-    template = modelTypeList[modelType]
     activation = activationTypeList[activationType]
     weightInit = weightInitTypeList[weightInitType]
 
-    return template(activation(), weightInit(), input_shape, classes)
+    return modelTemplate(activation(), weightInit(), input_shape, classes)
 
 
 def createGradientTemplate(gradientType):

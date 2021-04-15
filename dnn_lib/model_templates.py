@@ -60,19 +60,7 @@ def loss_meansquare():
     return {'type':'meansquare'}
 
 
-def template_complex(activation, weightInit, input_shape, classes):
-
-    layers = [
-        {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'dense', 'parameter':{'units':1024, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'dense', 'parameter':{'units':512, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'dense', 'parameter':{'units':256, 'activation':activation, 'weight_init':weightInit}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
-
-    return layers
-
-
-def template_light(activation, weightInit, input_shape, classes):
+def modelTemplate(activation, weightInit, input_shape, classes):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
@@ -84,17 +72,15 @@ def template_light(activation, weightInit, input_shape, classes):
 
 
 
-def createLayersTemplate(modelType, activationType, weightInitType, input_shape, classes):
+def creatModelTemplate(activationType, weightInitType, input_shape, classes):
 
-    modelTypeList = {'light':template_light, 'complex': template_complex}
     activationTypeList = {'elu':activation_elu, 'relu':activation_relu, 'leakyRelu':activation_leakyRelu, 'sigmoid':activation_sigmoid, 'tanh':activation_tanh, 'linear':activation_linear}
     weightInitTypeList = {'glorot_normal':weight_init_glorot_normal, 'glorot_uniform':weight_init_glorot_uniform, 'he_normal':weight_init_he_normal, 'he_uniform':weight_init_he_uniform, 'lecun_normal':weight_init_lecun_normal, 'lecun_uniform':weight_init_lecun_uniform}
 
-    template = modelTypeList[modelType]
     activation = activationTypeList[activationType]
     weightInit = weightInitTypeList[weightInitType]
 
-    return template(activation(), weightInit(), input_shape, classes)
+    return modelTemplate(activation(), weightInit(), input_shape, classes)
 
 
 def createGradientTemplate(gradientType):

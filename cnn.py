@@ -31,7 +31,7 @@ def print_performance(accuracy, span):
     print_table(table)
 
 
-def print_arg(model, activation, weightInit, gradient, loss, classes, epochs, batches, train_x_shape, train_t_shape, test_x_shape, test_t_shape):
+def print_arg(activation, weightInit, gradient, loss, classes, epochs, batches, train_x_shape, train_t_shape, test_x_shape, test_t_shape):
 
     trimed = batches > train_x_shape[0]
 
@@ -39,8 +39,8 @@ def print_arg(model, activation, weightInit, gradient, loss, classes, epochs, ba
 
     batch_str = str(batches) + (' (trimed)' if trimed else '')
 
-    arg = ['model', 'activation', 'weight init', 'gradient', 'loss', 'classes', 'epochs', 'batches', 'train x shape', 'train t shape', 'test x shape', 'test t shape']
-    values = [model, activation, weightInit, gradient, loss, classes, epochs, batch_str, train_x_shape, train_t_shape, test_x_shape, test_t_shape]
+    arg = ['activation', 'weight init', 'gradient', 'loss', 'classes', 'epochs', 'batches', 'train x shape', 'train t shape', 'test x shape', 'test t shape']
+    values = [activation, weightInit, gradient, loss, classes, epochs, batch_str, train_x_shape, train_t_shape, test_x_shape, test_t_shape]
     table = {'Argument':arg, 'Values':values}
     print_table(table)
 
@@ -53,9 +53,9 @@ def print_layer(layerList):
     print_table({'Layer':layerNames, 'Output Shape':outputShapes})
 
 
-def create(modelType, activationType, weightInitType, input_shape, classes, gradientType, lossType):
+def create(activationType, weightInitType, input_shape, classes, gradientType, lossType):
 
-    layersTemplate = createLayersTemplate(modelType, activationType, weightInitType, input_shape, classes)
+    layersTemplate = createModelTemplate(activationType, weightInitType, input_shape, classes)
     gradientTemplate = createGradientTemplate(gradientType)
     lossTemplate = createLossTemplate(lossType)
 
@@ -116,15 +116,15 @@ def test(tars, test_x, test_t):
     return accuracy
 
 
-def main(modelType, activationType, weightInitType, gradientType, lossType, classes, epochs, batches):
+def main(activationType, weightInitType, gradientType, lossType, classes, epochs, batches):
 
     train_x, train_t, test_x, test_t, oneHotMap = loadDataSet(classes)
 
-    print_arg(modelType, activationType, weightInitType, gradientType, lossType, train_t.shape[-1], epochs, batches, train_x.shape, train_t.shape, test_x.shape, test_t.shape)
+    print_arg(activationType, weightInitType, gradientType, lossType, train_t.shape[-1], epochs, batches, train_x.shape, train_t.shape, test_x.shape, test_t.shape)
 
     print_oneHotMap(oneHotMap)
 
-    tars = create(modelType, activationType, weightInitType, train_x.shape[1:], train_t.shape[-1], gradientType, lossType)
+    tars = create(activationType, weightInitType, train_x.shape[1:], train_t.shape[-1], gradientType, lossType)
 
     train_span = train(tars, train_x, train_t, epochs, batches)
 
@@ -137,12 +137,11 @@ def parse_arg():
 
     parser = argparse.ArgumentParser(prog='CNN')
     parser.add_argument('-c', dest='classes', type=int, default='3', metavar="[1-10]", help='classes (default: 3)')
-    parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='adam', choices=['adam', 'sgd', 'rmsProp'], help='gradient type (default: rmsProp)')
     parser.add_argument('-l', dest='lossType', type=str, default='categorical', choices=['categorical', 'binary', 'meansquare'], help='loss type (default: categorical)')
     parser.add_argument('-a', dest='activationType', type=str, default='leakyRelu', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='he_normal', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: he_normal)')
-    parser.add_argument('-e', dest='epochs', type=int, default=10, help='epochs (default: 10)')
+    parser.add_argument('-e', dest='epochs', type=int, default=20, help='epochs (default: 20)')
     parser.add_argument('-b', dest='batches', type=int, help='batches (default: 100)')
     args = parser.parse_args()
 
@@ -164,4 +163,4 @@ if __name__ == "__main__":
     args = parse_arg()
 
     if args != None:
-        main(args.modelType, args.activationType, args.weightInitType, args.gradientType, args.lossType, args.classes, args.epochs, args.batches)
+        main(args.activationType, args.weightInitType, args.gradientType, args.lossType, args.classes, args.epochs, args.batches)

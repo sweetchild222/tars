@@ -34,7 +34,7 @@ def drawTestY(test_y_on_epoch, feature_max):
         matrixToImage(path, fileName, matrix)
 
 
-def print_arg(model, activation, weightInit, gradient, loss, classes, epochs, batches, train_x_shape, train_t_shape, test_x_shape):
+def print_arg(activation, weightInit, gradient, loss, classes, epochs, batches, train_x_shape, train_t_shape, test_x_shape):
 
     trimed = batches > train_x_shape[0]
 
@@ -42,8 +42,8 @@ def print_arg(model, activation, weightInit, gradient, loss, classes, epochs, ba
 
     batch_str = str(batches) + (' (trimed)' if trimed else '')
 
-    arg = ['model', 'activation', 'weight init', 'gradient', 'loss', 'classes', 'epochs', 'batches', 'train x shape', 'train t shape', 'test x shape']
-    values = [model, activation, weightInit, gradient, loss, classes, epochs, batch_str, train_x_shape, train_t_shape, test_x_shape]
+    arg = ['activation', 'weight init', 'gradient', 'loss', 'classes', 'epochs', 'batches', 'train x shape', 'train t shape', 'test x shape']
+    values = [activation, weightInit, gradient, loss, classes, epochs, batch_str, train_x_shape, train_t_shape, test_x_shape]
     table = {'Argument':arg, 'Values':values}
     print_table(table)
 
@@ -66,9 +66,9 @@ def print_layer(layerList):
     print_table({'Layer':layerNames, 'Output Shape':outputShapes})
 
 
-def create(modelType, activationType, weightInitType, input_shape, classes, gradientType, lossType):
+def create(activationType, weightInitType, input_shape, classes, gradientType, lossType):
 
-    layersTemplate = createLayersTemplate(modelType, activationType, weightInitType, input_shape, classes)
+    layersTemplate = creatModelTemplate(activationType, weightInitType, input_shape, classes)
     gradientTemplate =  createGradientTemplate(gradientType)
     lossTemplate = createLossTemplate(lossType)
 
@@ -111,13 +111,13 @@ def train_test(tars, train_x, train_t, test_x, epochs, batches, draw_epoch_term)
     return test_y_on_epoch, train_span
 
 
-def main(modelType, activationType, weightInitType, gradientType, lossType, epochs, batches, draw_epoch_term):
+def main(activationType, weightInitType, gradientType, lossType, epochs, batches, draw_epoch_term):
 
     train_x, train_t, test_x, feature_max = loadDataSet()
 
-    print_arg(modelType, activationType, weightInitType, gradientType, lossType, train_t.shape[-1], epochs, batches, train_x.shape, train_t.shape, test_x.shape)
+    print_arg(activationType, weightInitType, gradientType, lossType, train_t.shape[-1], epochs, batches, train_x.shape, train_t.shape, test_x.shape)
 
-    tars = create(modelType, activationType, weightInitType, train_x.shape[1:], train_t.shape[-1], gradientType, lossType)
+    tars = create(activationType, weightInitType, train_x.shape[1:], train_t.shape[-1], gradientType, lossType)
 
     test_y_on_epoch, train_span = train_test(tars, train_x, train_t, test_x, epochs, batches, draw_epoch_term)
 
@@ -129,7 +129,6 @@ def main(modelType, activationType, weightInitType, gradientType, lossType, epoc
 def parse_arg():
 
     parser = argparse.ArgumentParser(prog='DNN')
-    parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='rmsProp', choices=['adam', 'sgd', 'rmsProp'], help='gradient type (default: rmsProp)')
     parser.add_argument('-l', dest='lossType', type=str, default='categorical', choices=['categorical', 'binary', 'meansquare'], help='loss type (default: categorical)')
     parser.add_argument('-a', dest='activationType', type=str, default='elu', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='activation type (default: relu)')
@@ -156,4 +155,4 @@ if __name__ == "__main__":
     args = parse_arg()
 
     if args != None:
-        main(args.modelType, args.activationType, args.weightInitType, args.gradientType, args.lossType, args.epochs, args.batches, args.draw_epoch_term)
+        main(args.activationType, args.weightInitType, args.gradientType, args.lossType, args.epochs, args.batches, args.draw_epoch_term)
