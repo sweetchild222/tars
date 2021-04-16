@@ -205,8 +205,8 @@ def parse_arg():
     parser.add_argument('-l', dest='lossType', type=str, default='categorical', choices=['categorical', 'binary', 'meansquare'], help='loss type (default: categorical)')
     parser.add_argument('-a', dest='activationType', type=str, default='tanh', choices=['linear', 'relu', 'elu', 'leakyRelu', 'sigmoid', 'tanh'], help='sample activation type (default: relu)')
     parser.add_argument('-w', dest='weightInitType', type=str, default='he_normal', choices=['lecun_uniform', 'glorot_uniform', 'he_uniform', 'lecun_normal', 'glorot_normal', 'he_normal'], help='weight initial type (default: he_normal)')
-    parser.add_argument('-e', dest='epochs', type=int, default=200, help='epochs (default: 200)')
-    parser.add_argument('-b', dest='batches', type=int, default=20, help='batches (default: 10)')
+    parser.add_argument('-e', dest='epochs', type=int, default=500, help='epochs (default: 500)')
+    parser.add_argument('-b', dest='batches', type=int, default=4, help='batches (default: 4)')
     parser.add_argument('--f', dest='stateful', action='store_true', help='stateful (default: False)')
     parser.add_argument('--u', dest='unroll', action='store_true', help='unroll (default: False)')
 
