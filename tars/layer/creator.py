@@ -8,6 +8,7 @@ from tars.layer.flatten import *
 from tars.layer.dense import *
 from tars.layer.basicRNN import *
 from tars.layer.lstm import *
+from tars.layer.gru import *
 
 
 
@@ -22,8 +23,8 @@ def createLayers(layersTemplate, gradientTemplate):
         parameter = layer['parameter'] if 'parameter' in layer else {}
         parameter['backward_layer'] = backward_layer
 
-        layerClass = {'input':Input, 'convolution':Convolution, 'maxPooling':MaxPooling, 'flatten':Flatten, 'dense':Dense, 'basicRNN':BasicRNN, 'lstm':LSTM}
-        gradientLayerClass = {'convolution':Convolution, 'dense':Dense, 'basicRNN':BasicRNN, 'lstm':LSTM}
+        layerClass = {'input':Input, 'convolution':Convolution, 'maxPooling':MaxPooling, 'flatten':Flatten, 'dense':Dense, 'basicRNN':BasicRNN, 'lstm':LSTM, 'gru':GRU}
+        gradientLayerClass = {'convolution':Convolution, 'dense':Dense, 'basicRNN':BasicRNN, 'lstm':LSTM, 'gru':GRU}
         type = layer['type']
 
         if type in gradientLayerClass:

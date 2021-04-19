@@ -61,6 +61,18 @@ def loss_meansquare():
 
 
 
+def template_gru(activation, weightInit, input_shape, classes, unroll, stateful):
+
+    layers = [
+        {'type':'input', 'parameter':{'input_shape':input_shape}},
+        {'type':'gru', 'parameter':{'units':256, 'activation':activation, 'recurrent_activation':activation_sigmoid(), 'weight_init':weightInit, 'unroll':unroll, 'stateful':stateful}},
+        {'type':'dense', 'parameter':{'units':128, 'activation':activation, 'weight_init':weightInit}},
+        {'type':'dense', 'parameter':{'units':classes, 'activation':activation_linear(), 'weight_init':weightInit}}]
+
+    return layers
+
+
+
 def template_lstm(activation, weightInit, input_shape, classes, unroll, stateful):
 
     layers = [
@@ -85,7 +97,7 @@ def template_basic(activation, weightInit, input_shape, classes, unroll, statefu
 
 def createLayersTemplate(modelType, activationType, weightInitType, input_shape, classes, unroll, statefull):
 
-    modelTypeList = {'basic':template_basic, 'lstm':template_lstm}
+    modelTypeList = {'basic':template_basic, 'lstm':template_lstm, 'gru':template_gru}
     activationTypeList = {'elu':activation_elu, 'relu':activation_relu, 'leakyRelu':activation_leakyRelu, 'sigmoid':activation_sigmoid, 'tanh':activation_tanh, 'linear':activation_linear}
     weightInitTypeList = {'glorot_normal':weight_init_glorot_normal, 'glorot_uniform':weight_init_glorot_uniform, 'he_normal':weight_init_he_normal, 'he_uniform':weight_init_he_uniform, 'lecun_normal':weight_init_lecun_normal, 'lecun_uniform':weight_init_lecun_uniform}
 
