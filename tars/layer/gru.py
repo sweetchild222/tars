@@ -14,7 +14,7 @@ class GRU(ABSLayer):
         self.unroll = unroll
         self.stateful = stateful
 
-        self.sets_count = 3
+        self.sets_count = 3 # r,z,g
 
         kernel_count = 1 if self.unroll is False else self.input_shape[-2]
 
@@ -100,57 +100,8 @@ class GRU(ABSLayer):
 
 
     def test(self, input):
+        pass
 
-        (sequence_length, vocab_size) = self.input_shape
-
-        (batche, cur_sequence_length, cur_vocab_size) = input.shape
-
-        h_list = []
-
-        if (self.stateful is False and self.test_proceed == 0) or self.h_test is None or self.c_test is None:
-            self.h_test = np.zeros((batche, self.getUnits()))
-            self.c_test = np.zeros((batche, self.getUnits()))
-
-        recur_act_func = [createActivation(self.recurrent_activation) for i in range(cur_sequence_length)]
-        g_act_func = [createActivation(self.activation) for i in range(cur_sequence_length)]
-        output_act_func = [createActivation(self.activation) for i in range(cur_sequence_length)]
-
-        for s in range(cur_sequence_length):
-
-            kernel_index = 0 if self.unroll is False else self.test_proceed
-
-            weight_i = self.weight_i_list[kernel_index]
-            weight_h = self.weight_h_list[kernel_index]
-            bias = self.bias_list[kernel_index]
-
-            matmul_i = np.matmul(input[:,s,:], weight_i)
-            matmul_h = np.matmul(self.h_test, weight_h)
-
-            batch_bias = np.array([bias] * batche).reshape((self.sets_count, batche, -1))
-
-            matmul_calc = matmul_i + matmul_h + batch_bias
-
-            g_value = g_act_func[s].forward(matmul_calc[-1])
-
-            recur_sets = recur_act_func[s].forward(matmul_calc[:-1])
-            i_value = recur_sets[0]
-            f_value = recur_sets[1]
-            o_value = recur_sets[2]
-
-            self.c_test = (f_value * self.c_test) + (i_value * g_value)
-
-            z_value = output_act_func[s].forward(self.c_test)
-
-            self.h_test = o_value * z_value
-            h_list.append(self.h_test)
-
-            self.test_proceed = (self.test_proceed + 1) % sequence_length
-
-            if self.stateful is False and self.test_proceed == 0:
-                self.h_test = np.zeros((batche, self.getUnits()))
-                self.c_test = np.zeros((batche, self.getUnits()))
-
-        return np.swapaxes(np.array(h_list), 1, 0)
 
 
     def forward(self, input):
@@ -208,8 +159,6 @@ class GRU(ABSLayer):
 
         self.h_list.insert(0, h_init)
 
-        print(output.shape)
-
         return output
 
 
@@ -218,7 +167,6 @@ class GRU(ABSLayer):
         (batche, sequence_length, units) = error.shape
 
         d_h_prev = np.zeros((batche, self.getUnits()))
-        d_c_prev = np.zeros((batche, self.getUnits()))
 
         wi_delta_list = []
         wh_delta_list = []
@@ -229,28 +177,32 @@ class GRU(ABSLayer):
 
             kernel_index = 0 if self.unroll is False else s
 
+            weight_h = self.weight_h_list[kernel_index]
+            weight_i = self.weight_i_list[kernel_index]
+
             g_value = self.g_list[s]
 
             recur_sets = self.recur_sets_list[s]
-            i_value = recur_sets[0]
-            f_value = recur_sets[1]
-            o_value = recur_sets[2]
+            r_value = recur_sets[0]
+            z_value = recur_sets[1]
+
+            h_prev = self.h_list[s]
 
             err = error[:, s,:] + d_h_prev
 
-            d_c = d_c_prev + self.output_act_func[s].backward(err) * o_value
-            d_c_prev = d_c * f_value
+            d_z = -(err * g_value)
+            d_z += (err * h_prev)
 
-            d_g = d_c * i_value
-            d_i = d_c * g_value
-            d_f = d_c * self.c_list[s]
-            d_o = err * self.z_list[s]
+            d_g = self.g_act_func[s].backward((1-z_value) * err)
 
-            d_d_recur_sets = self.recur_act_func[s].backward(np.array([d_i, d_f, d_o]))
-            d_d_g = self.g_act_func[s].backward(d_g)
-            d_d_g = np.expand_dims(d_d_g, axis=0)
+            d_inter = np.matmul(d_g, weight_h[-1].swapaxes(-2, -1))
 
-            d_h_raw = np.concatenate((d_d_recur_sets, d_d_g), axis=0)
+            d_r_z = self.recur_act_func[s].backward(np.array([d_z, d_inter * h_prev]))
+
+            d_r = d_r_z[0]
+            d_z = d_r_z[1]
+
+            d_h_raw = np.array([d_r, d_z, d_g])
             d_h_raw_expand = np.expand_dims(d_h_raw, axis=-2)
 
             last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
@@ -263,10 +215,9 @@ class GRU(ABSLayer):
             wh_delta_list.append(wh_delta)
             b_delta_list.append(d_h_raw_expand)
 
-            weight_h = self.weight_h_list[kernel_index]
-            weight_i = self.weight_i_list[kernel_index]
-
             d_h_prev = np.matmul(d_h_raw, weight_h.swapaxes(-2, -1))
+
+            d_h_prev[-1] = d_h_prev[-1] * r_value
             d_h_prev = np.sum(d_h_prev, axis=0)
 
             back_error = np.matmul(d_h_raw, weight_i.swapaxes(-2, -1))
