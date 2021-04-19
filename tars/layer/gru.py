@@ -93,15 +93,57 @@ class GRU(ABSLayer):
     def resetState(self):
 
         self.h_test = None
-        self.c_test = None
         self.test_proceed = 0
 
         self.h_next = None
 
 
     def test(self, input):
-        pass
 
+        (sequence_length, vocab_size) = self.input_shape
+
+        (batche, cur_sequence_length, cur_vocab_size) = input.shape
+
+        if (self.stateful is False and self.test_proceed == 0) is False or self.h_test is None:
+            self.h_test = np.zeros((batche, self.getUnits()))
+
+        h_list = []
+
+        recur_act_func = [createActivation(self.recurrent_activation) for i in range(cur_sequence_length)]
+        g_act_func = [createActivation(self.activation) for i in range(cur_sequence_length)]
+
+        for s in range(cur_sequence_length):
+
+            kernel_index = 0 if self.unroll is False else self.test_proceed
+
+            weight_i = self.weight_i_list[kernel_index]
+            weight_h = self.weight_h_list[kernel_index]
+            bias = self.bias_list[kernel_index]
+
+            matmul_i = np.matmul(input[:,s,:], weight_i)
+            matmul_h = np.matmul(self.h_test, weight_h)
+
+            batch_bias = np.array([bias] * batche).reshape((self.sets_count, batche, -1))
+
+            matmul_calc_rz = matmul_i[:-1] + matmul_h[:-1] + batch_bias[:-1]
+
+            recur_sets = self.recur_act_func[s].forward(matmul_calc_rz)
+            r_value = recur_sets[0]
+            z_value = recur_sets[1]
+
+            matmul_calc_g = matmul_i[-1] + (matmul_h[-1] * r_value) + batch_bias[-1]
+
+            g_value = self.g_act_func[s].forward(matmul_calc_g)
+
+            self.h_test = z_value * self.h_test + ((1-z_value) * g_value)
+            h_list.append(self.h_test)
+
+            self.test_proceed = (self.test_proceed + 1) % sequence_length
+
+            if self.stateful is False and self.test_proceed == 0:
+                self.h_test = np.zeros((batche, self.getUnits()))
+
+        return np.swapaxes(np.array(h_list), 1, 0)
 
 
     def forward(self, input):
