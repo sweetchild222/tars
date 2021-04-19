@@ -135,7 +135,7 @@ class GRU(ABSLayer):
 
             g_value = self.g_act_func[s].forward(matmul_calc_g)
 
-            self.h_test = z_value * self.h_test + ((1-z_value) * g_value)
+            self.h_test = z_value * self.h_test + ((1 - z_value) * g_value)
             h_list.append(self.h_test)
 
             self.test_proceed = (self.test_proceed + 1) % sequence_length
@@ -194,7 +194,7 @@ class GRU(ABSLayer):
             g_value = self.g_act_func[s].forward(matmul_calc_g)
             self.g_list.append(g_value)
 
-            self.h_next = z_value * self.h_next + ((1-z_value) * g_value)
+            self.h_next = z_value * self.h_next + ((1 - z_value) * g_value)
             self.h_list.append(self.h_next)
 
         output = np.swapaxes(np.array(self.h_list), 1, 0)
