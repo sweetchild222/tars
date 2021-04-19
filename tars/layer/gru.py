@@ -14,7 +14,7 @@ class GRU(ABSLayer):
         self.unroll = unroll
         self.stateful = stateful
 
-        self.sets_count = 4
+        self.sets_count = 3
 
         kernel_count = 1 if self.unroll is False else self.input_shape[-2]
 
@@ -25,7 +25,6 @@ class GRU(ABSLayer):
         self.gradient = self.gradientBind(gradient, self.weight_i_list, self.weight_h_list, self.bias_list)
 
         self.h_test = None
-        self.c_test = None
         self.test_proceed = 0
 
         self.h_next = None
@@ -166,21 +165,16 @@ class GRU(ABSLayer):
         (batche, sequence_length, vocab_size) = input.shape
 
         self.h_list = []
-        self.c_list = []
         self.recur_sets_list = []
         self.g_list = []
-        self.z_list = []
 
         if self.stateful is False or self.h_next is None:
             self.h_next = np.zeros((batche, self.getUnits()))
-            self.c_next = np.zeros((batche, self.getUnits()))
 
         h_init = self.h_next
-        c_init = self.c_next
 
         self.recur_act_func = [createActivation(self.recurrent_activation) for i in range(sequence_length)]
         self.g_act_func = [createActivation(self.activation) for i in range(sequence_length)]
-        self.output_act_func = [createActivation(self.activation) for i in range(sequence_length)]
 
         for s in range(sequence_length):
 
@@ -195,30 +189,26 @@ class GRU(ABSLayer):
 
             batch_bias = np.array([bias] * batche).reshape((self.sets_count, batche, -1))
 
-            matmul_calc = matmul_i + matmul_h + batch_bias
+            matmul_calc_rz = matmul_i[:-1] + matmul_h[:-1] + batch_bias[:-1]
 
-            g_value = self.g_act_func[s].forward(matmul_calc[-1])
+            recur_sets = self.recur_act_func[s].forward(matmul_calc_rz)
+            self.recur_sets_list.append(recur_sets)
+            r_value = recur_sets[0]
+            z_value = recur_sets[1]
+
+            matmul_calc_g = matmul_i[-1] + (matmul_h[-1] * r_value) + batch_bias[-1]
+
+            g_value = self.g_act_func[s].forward(matmul_calc_g)
             self.g_list.append(g_value)
 
-            recur_sets = self.recur_act_func[s].forward(matmul_calc[:-1])
-            self.recur_sets_list.append(recur_sets)
-            i_value = recur_sets[0]
-            f_value = recur_sets[1]
-            o_value = recur_sets[2]
-
-            self.c_next = (f_value * self.c_next) + (i_value * g_value)
-            self.c_list.append(self.c_next)
-
-            z_value = self.output_act_func[s].forward(self.c_next)
-            self.z_list.append(z_value)
-
-            self.h_next = o_value * z_value
+            self.h_next = z_value * self.h_next + ((1-z_value) * g_value)
             self.h_list.append(self.h_next)
 
         output = np.swapaxes(np.array(self.h_list), 1, 0)
 
         self.h_list.insert(0, h_init)
-        self.c_list.insert(0, c_init)
+
+        print(output.shape)
 
         return output
 
