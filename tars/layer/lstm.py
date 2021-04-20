@@ -14,7 +14,7 @@ class LSTM(ABSLayer):
         self.unroll = unroll
         self.stateful = stateful
 
-        self.sets_count = 4
+        self.sets_count = 4 #i, f, o, g
 
         kernel_count = 1 if self.unroll is False else self.input_shape[-2]
 
@@ -260,26 +260,26 @@ class LSTM(ABSLayer):
             d_d_g = self.g_act_func[s].backward(d_g)
             d_d_g = np.expand_dims(d_d_g, axis=0)
 
-            d_h_raw = np.concatenate((d_d_recur_sets, d_d_g), axis=0)
-            d_h_raw_expand = np.expand_dims(d_h_raw, axis=-2)
+            d_d_all = np.concatenate((d_d_recur_sets, d_d_g), axis=0)
+            d_d_all_expand = np.expand_dims(d_d_all, axis=-2)
 
             last_i = np.expand_dims(self.last_input[:, s,:], axis=-1)
             h_prev = np.expand_dims(self.h_list[s], axis=-1)
 
-            wi_delta = np.matmul(last_i, d_h_raw_expand)
-            wh_delta = np.matmul(h_prev, d_h_raw_expand)
+            wi_delta = np.matmul(last_i, d_d_all_expand)
+            wh_delta = np.matmul(h_prev, d_d_all_expand)
 
             wi_delta_list.append(wi_delta)
             wh_delta_list.append(wh_delta)
-            b_delta_list.append(d_h_raw_expand)
+            b_delta_list.append(d_d_all_expand)
 
             weight_h = self.weight_h_list[kernel_index]
             weight_i = self.weight_i_list[kernel_index]
 
-            d_h_prev = np.matmul(d_h_raw, weight_h.swapaxes(-2, -1))
+            d_h_prev = np.matmul(d_d_all, weight_h.swapaxes(-2, -1))
             d_h_prev = np.sum(d_h_prev, axis=0)
 
-            back_error = np.matmul(d_h_raw, weight_i.swapaxes(-2, -1))
+            back_error = np.matmul(d_d_all, weight_i.swapaxes(-2, -1))
             back_error = np.sum(back_error, axis=0)
 
             back_layer_error_list.append(back_error)
