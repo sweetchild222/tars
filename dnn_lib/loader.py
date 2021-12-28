@@ -38,8 +38,8 @@ def loadDataSet():
     test_x = loadTestDataSet(feature_max)
 
     all_x = np.vstack((train_x, test_x))
-    all_x -= np.mean(all_x)
-    all_x /= np.std(all_x)
+    all_x -= np.mean(all_x, axis=0)
+    all_x /= np.std(all_x, axis=0)
 
     train_x = all_x[0:len(train_x)]
     test_x = all_x[-len(test_x):]
