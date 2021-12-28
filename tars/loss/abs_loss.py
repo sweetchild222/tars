@@ -8,9 +8,16 @@ class ABSLoss(metaclass=ABCMeta):
         pass
 
 
+    @abstractmethod
     def forward(self, input):
         pass
 
 
+    @abstractmethod
     def backward(self, y, target):
+        pass
+
+
+    @abstractmethod
+    def loss(self, y, target):
         pass
